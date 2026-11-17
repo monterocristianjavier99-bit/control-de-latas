@@ -14,6 +14,7 @@ nav button.active{background:#fff;color:var(--ink)}
 main{max-width:650px;margin:auto;padding:16px 14px 40px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px}
 input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);max-width:170px}
+.download-btn{padding:11px 13px;border-radius:12px;background:var(--ink);color:#fff;font-weight:800;white-space:nowrap}
 .progress{height:7px;background:#e5e9e3;border-radius:20px;overflow:hidden;margin:0 0 16px}.progress i{display:block;height:100%;background:var(--ink)}
 .cat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px;margin:0 0 14px}
 .cat h2{font-size:16px;margin:0 0 6px;padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:#f8f1df}
@@ -34,6 +35,20 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 .keys{display:grid;grid-template-columns:1fr 1fr;gap:10px}.keys button{height:76px;border-radius:18px;background:#edf0eb;color:var(--ink);font-size:32px;font-weight:850}
 .keys .clear{background:#f6e9e5;color:var(--red);font-size:20px}.keys .enter{background:var(--ink);color:white;font-size:22px}
 .hidden{display:none!important}.muted{color:var(--muted);font-size:13px}
+@media print{
+ @page{size:A4;margin:14mm}
+ body{background:#fff;color:#111;font-size:11pt}
+ header,nav,.top,.progress,.hint,#keypadPanel,#historyView,#flavorsView{display:none!important}
+ main{max-width:none;margin:0;padding:0}
+ #countView{display:block!important}
+ #catalogList{display:block!important}
+ .cat{break-inside:avoid;border:0;border-radius:0;padding:0;margin:0 0 12px;background:#fff}
+ .cat h2{background:#eee;border:0;border-radius:0;padding:7px 8px;margin:0 0 4px;font-size:12pt}
+ .flavor{min-height:0;padding:4px 8px;grid-template-columns:1fr 90px;border-bottom:1px solid #ddd}
+ .name{font-size:10pt}.amount{border:0;background:transparent;min-height:0;font-size:10pt;display:block;text-align:right;padding:0}
+ #printHeading{display:block!important;margin:0 0 12px}
+}
+#printHeading{display:none}
 </style></head>
 <body>
 <header><h1>CONTROL DE LATAS</h1><nav>
@@ -41,7 +56,8 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 </nav></header>
 <main>
 <section id="countView">
-<div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong></div>
+<div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
+<div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">Descargar PDF</button></div>
 <div class="progress"><i id="progressBar" style="width:0%"></i></div>
 <div id="catalogList"></div>
 <p class="hint">Tocá el espacio de cada sabor para abrir el teclado de cantidades.</p>
@@ -84,9 +100,18 @@ if(selected){const row=document.querySelector(`[data-row="${CSS.escape(selected)
 function openKey(id){selected=id;let f=entries().find(x=>x.id===id);document.querySelector("#selectedName").textContent=f?.label||"Sabor";renderCount();}
 function updateSelectedAmount(){if(!selected)return;const value=day()[selected],button=document.querySelector(`.amount[data-id="${CSS.escape(selected)}"]`);if(button){button.textContent=fmt(value);button.classList.toggle("empty",value===undefined);}let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;document.querySelector("#progressText").textContent=`${done} / ${all.length}`;document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";}
 function closeKey(){document.querySelector("#keypadPanel").classList.remove("show");selected=null;save()}
-document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){day()[selected]=Number(b.dataset.val);save();updateSelectedAmount();}});
+function enterNext(){
+ if(!selected){closeKey();return;}
+ save();
+ const all=entries();
+ const index=all.findIndex(f=>f.id===selected);
+ const next=all[index+1];
+ if(next){openKey(next.id);}
+ else{closeKey();}
+}
+document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){const current=day()[selected]??0;day()[selected]=Math.round((current+Number(b.dataset.val))*10)/10;save();updateSelectedAmount();}});
 document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[selected];save();updateSelectedAmount();}};
-document.querySelector("#enterValue").onclick=closeKey;
+document.querySelector("#enterValue").onclick=enterNext;
 document.querySelector("#closeKey").onclick=closeKey;
 dateEl.onchange=()=>{selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
@@ -104,6 +129,20 @@ document.querySelectorAll("[data-delcat]").forEach(x=>x.onclick=()=>{let i=+x.da
 }
 document.querySelector("#addCategory").onclick=()=>{let name=prompt("Nombre de categoría");if(name){catalog.push({id:uid(),name:name.toUpperCase(),items:[]});save();renderEdit()}};
 document.querySelector("#restore").onclick=()=>{if(confirm("¿Restaurar los 41 sabores originales?")){catalog=original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))}));save();renderEdit();renderCount()}};
+
+document.querySelector("#downloadPdf").onclick=()=>{
+ const values=day();
+ const total=entries().reduce((sum,f)=>sum+(Number(values[f.id])||0),0);
+ document.querySelector("#printDate").textContent="Fecha: "+new Date(dateEl.value+"T12:00:00").toLocaleDateString("es-AR");
+ document.querySelector("#printTotal").textContent="Total general: "+fmt(total);
+ const wasSelected=selected;
+ selected=null;
+ document.querySelector("#keypadPanel").classList.remove("show");
+ renderCount();
+ window.print();
+ if(wasSelected){selected=wasSelected;renderCount();}
+};
+
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 renderCount();
 </script></body></html>
