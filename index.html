@@ -28,7 +28,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 .smallbtn{padding:8px 11px;border-radius:10px;background:var(--soft);font-weight:700;color:var(--ink)}
 .editrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px;align-items:center;margin:7px 0}
 .editrow input{min-width:0;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit}
-.keypad-panel{display:none;width:100%;max-width:480px;margin:16px auto 24px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 22px #0001;scroll-margin:18px}
+.keypad-panel{display:none;width:100%;margin:12px 0 16px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:none}
 .keypad-panel.show{display:block}.keypad{width:100%}
 .keyhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.keyhead strong{font-size:18px}.close{background:#e8ece7;border-radius:50%;width:38px;height:38px;font-size:22px}
 .keys{display:grid;grid-template-columns:1fr 1fr;gap:10px}.keys button{height:76px;border-radius:18px;background:#edf0eb;color:var(--ink);font-size:32px;font-weight:850}
@@ -75,16 +75,20 @@ function renderCount(){
 let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;
 document.querySelector("#progressText").textContent=`${done} / ${all.length}`;
 document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";
-document.querySelector("#catalogList").innerHTML=catalog.map(c=>`<section class="cat"><h2>${esc(c.name)}</h2>${c.items.map(f=>`<div class="flavor"><span class="name">${esc(f.label)}</span><button class="amount ${values[f.id]===undefined?"empty":""}" data-id="${f.id}">${fmt(values[f.id])}</button></div>`).join("")}</section>`).join("");
+document.querySelector("#catalogList").innerHTML=catalog.map(c=>`<section class="cat"><h2>${esc(c.name)}</h2>${c.items.map(f=>`<div class="flavor" data-row="${f.id}"><span class="name">${esc(f.label)}</span><button class="amount ${values[f.id]===undefined?"empty":""}" data-id="${f.id}">${fmt(values[f.id])}</button></div>`).join("")}</section>`).join("");
 document.querySelectorAll(".amount").forEach(b=>b.onclick=()=>openKey(b.dataset.id));
+// Keep the keypad directly under the selected flavor, without scrolling or covering the page.
+const panel=document.querySelector("#keypadPanel");
+if(selected){const row=document.querySelector(`[data-row="${CSS.escape(selected)}"]`);if(row){row.insertAdjacentElement("afterend",panel);panel.classList.add("show");}else{panel.classList.remove("show");}}
 }
-function openKey(id){selected=id;let f=entries().find(x=>x.id===id);document.querySelector("#selectedName").textContent=f?.label||"Sabor";const panel=document.querySelector("#keypadPanel");panel.classList.add("show");panel.scrollIntoView({behavior:"smooth",block:"nearest"})}
+function openKey(id){selected=id;let f=entries().find(x=>x.id===id);document.querySelector("#selectedName").textContent=f?.label||"Sabor";renderCount();}
+function updateSelectedAmount(){if(!selected)return;const value=day()[selected],button=document.querySelector(`.amount[data-id="${CSS.escape(selected)}"]`);if(button){button.textContent=fmt(value);button.classList.toggle("empty",value===undefined);}let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;document.querySelector("#progressText").textContent=`${done} / ${all.length}`;document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";}
 function closeKey(){document.querySelector("#keypadPanel").classList.remove("show");selected=null;save()}
-document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){day()[selected]=Number(b.dataset.val);save();renderCount();}});
-document.querySelector("#clearValue").onclick=()=>{if(selected)delete day()[selected];save();renderCount()};
+document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){day()[selected]=Number(b.dataset.val);save();updateSelectedAmount();}});
+document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[selected];save();updateSelectedAmount();}};
 document.querySelector("#enterValue").onclick=closeKey;
 document.querySelector("#closeKey").onclick=closeKey;
-dateEl.onchange=renderCount;
+dateEl.onchange=()=>{selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
 function renderHistory(){let dates=Object.keys(history).filter(d=>Object.keys(history[d]||{}).length).sort().reverse();document.querySelector("#historyList").innerHTML=dates.length?dates.map(d=>`<div class="history-row"><div><strong>${new Date(d+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}</strong><div class="muted">${Object.keys(history[d]).length} sabores cargados</div></div><div><button class="smallbtn" data-open="${d}">Ver / editar</button> <button class="smallbtn" data-del="${d}">×</button></div></div>`).join(""):'<p class="muted">Todavía no hay conteos guardados.</p>';
 document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{dateEl.value=b.dataset.open;document.querySelector('[data-view="count"]').click();renderCount()});
