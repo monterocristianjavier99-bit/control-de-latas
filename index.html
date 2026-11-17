@@ -115,7 +115,17 @@ function enterNext(){
  document.querySelector("#selectedName").textContent=next.label;
  const nextRow=document.querySelector(`[data-row="${CSS.escape(next.id)}"]`);
  const panel=document.querySelector("#keypadPanel");
- if(nextRow && panel){nextRow.insertAdjacentElement("afterend",panel);panel.classList.add("show");nextRow.scrollIntoView({block:"nearest",behavior:"smooth"});}
+ if(nextRow && panel){
+   nextRow.insertAdjacentElement("afterend",panel);
+   panel.classList.add("show");
+   // Scroll the document (not just the keypad) so the selected flavor and its keypad remain visible.
+   requestAnimationFrame(()=>{
+     const rowTop=nextRow.getBoundingClientRect().top+window.scrollY;
+     const panelBottom=panel.getBoundingClientRect().bottom+window.scrollY;
+     const target=Math.max(0,rowTop-90,panelBottom-window.innerHeight+24);
+     window.scrollTo({top:target,behavior:"smooth"});
+   });
+ }
 }
 document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){const current=day()[selected]??0;day()[selected]=Math.round((current+Number(b.dataset.val))*10)/10;save();updateSelectedAmount();}});
 document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[selected];save();updateSelectedAmount();}};
@@ -138,13 +148,26 @@ document.querySelectorAll("[data-delcat]").forEach(x=>x.onclick=()=>{let i=+x.da
 document.querySelector("#addCategory").onclick=()=>{let name=prompt("Nombre de categoría");if(name){catalog.push({id:uid(),name:name.toUpperCase(),items:[]});save();renderEdit()}};
 document.querySelector("#restore").onclick=()=>{if(confirm("¿Restaurar los 41 sabores originales?")){catalog=original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))}));save();renderEdit();renderCount()}};
 
-document.querySelector("#downloadPdf").addEventListener("click",()=>{
+async function ensurePdfLibrary(){
+ if(window.jspdf?.jsPDF) return true;
+ const sources=[
+  "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js",
+  "https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"
+ ];
+ for(const src of sources){
+  try{await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src=src;script.onload=resolve;script.onerror=reject;document.head.appendChild(script)});if(window.jspdf?.jsPDF)return true;}catch(e){}
+ }
+ return false;
+}
+document.querySelector("#downloadPdf").addEventListener("click",async()=>{
+ const button=document.querySelector("#downloadPdf");
+ const oldLabel=button.textContent;button.textContent="Preparando PDF…";button.disabled=true;
  const values=day();
  const all=entries();
  const total=all.reduce((sum,f)=>sum+(Number(values[f.id])||0),0);
  const dateText=new Date(dateEl.value+"T12:00:00").toLocaleDateString("es-AR");
  // Create a real PDF instead of relying on the browser print dialog (unreliable on iPhone).
- if(window.jspdf && window.jspdf.jsPDF){
+ if(await ensurePdfLibrary()){
    const {jsPDF}=window.jspdf;
    const doc=new jsPDF({unit:"mm",format:"a4"});
    const pageW=210, left=15, right=195;
@@ -170,14 +193,9 @@ document.querySelector("#downloadPdf").addEventListener("click",()=>{
    doc.setFont("helvetica","bold");doc.setFontSize(12);doc.text("TOTAL GENERAL: "+fmt(total),left,y+3);
    doc.save("Control-de-latas-"+dateEl.value+".pdf");
  }else{
-   // Fallback if the PDF library cannot be loaded: use the browser's print-to-PDF flow.
-   document.querySelector("#printDate").textContent="Fecha: "+dateText;
-   document.querySelector("#printTotal").textContent="Total general: "+fmt(total);
-   const oldSelected=selected;selected=null;
-   document.querySelector("#keypadPanel").classList.remove("show");
-   renderCount();window.print();
-   if(oldSelected){selected=oldSelected;renderCount();}
+   alert("No se pudo cargar el generador de PDF. Revisá la conexión a internet e intentá nuevamente.");
  }
+ button.textContent=oldLabel;button.disabled=false;
 });
 // Prevent iOS Safari's double-tap and gesture zoom while preserving normal scrolling.
 document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
