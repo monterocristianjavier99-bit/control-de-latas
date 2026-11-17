@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#293b35"><title>CONTROL DE LATAS</title>
+<style>
+:root{--ink:#293b35;--paper:#f6f0e3;--card:#fffdf7;--line:#ded6c5;--muted:#78817b;--soft:#e9eee9;--red:#b45248}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,sans-serif}
+header{background:var(--ink);color:white;padding:calc(env(safe-area-inset-top) + 18px) 18px 18px;border-radius:0 0 28px 28px}
+h1{font-size:25px;margin:0 0 14px;font-weight:850;letter-spacing:.02em}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{font:inherit;border:0;cursor:pointer}
+nav button{padding:12px 5px;border-radius:14px;background:#e6e9e3;color:var(--ink);font-weight:750}
+nav button.active{background:#fff;color:var(--ink)}
+main{max-width:650px;margin:auto;padding:16px 14px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px}
+input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);max-width:170px}
+.progress{height:7px;background:#e5e9e3;border-radius:20px;overflow:hidden;margin:0 0 16px}.progress i{display:block;height:100%;background:var(--ink)}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px;margin:0 0 14px}
+.cat h2{font-size:16px;margin:0 0 6px;padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:#f8f1df}
+.flavor{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:10px;align-items:center;padding:8px 5px;border-bottom:1px solid #eee9df;min-height:54px}
+.flavor:last-child{border-bottom:0}.name{font-size:16px;font-weight:550}
+.amount{min-height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:center;font-size:20px;font-weight:800;color:var(--ink);display:grid;place-items:center}
+.amount.empty{color:#9aa19c;font-weight:500}
+.hint{font-size:12px;color:var(--muted);margin:10px 3px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:12px}
+.panel h2{font-size:17px;margin:0 0 12px}
+.history-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.smallbtn{padding:8px 11px;border-radius:10px;background:var(--soft);font-weight:700;color:var(--ink)}
+.editrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px;align-items:center;margin:7px 0}
+.editrow input{min-width:0;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit}
+.overlay{position:fixed;inset:0;background:#17211dcc;display:none;align-items:flex-end;justify-content:center;padding:14px;padding-bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:10}
+.overlay.show{display:flex}.keypad{width:min(100%,480px);background:var(--card);border-radius:24px;padding:18px;box-shadow:0 12px 50px #0004}
+.keyhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.keyhead strong{font-size:18px}.close{background:#e8ece7;border-radius:50%;width:38px;height:38px;font-size:22px}
+.keys{display:grid;grid-template-columns:1fr 1fr;gap:10px}.keys button{height:76px;border-radius:18px;background:#edf0eb;color:var(--ink);font-size:32px;font-weight:850}
+.keys .clear{background:#f6e9e5;color:var(--red);font-size:20px}.keys .enter{background:var(--ink);color:white;font-size:22px}
+.hidden{display:none!important}.muted{color:var(--muted);font-size:13px}
+</style></head>
+<body>
+<header><h1>CONTROL DE LATAS</h1><nav>
+<button class="active" data-view="count">Conteo</button><button data-view="history">Historial</button><button data-view="flavors">Sabores</button>
+</nav></header>
+<main>
+<section id="countView">
+<div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong></div>
+<div class="progress"><i id="progressBar" style="width:0%"></i></div>
+<div id="catalogList"></div>
+<p class="hint">Tocá el espacio de cada sabor para abrir el teclado de cantidades.</p>
+</section>
+<section id="historyView" class="hidden"><div class="panel"><h2>Historial de conteos</h2><div id="historyList"></div></div></section>
+<section id="flavorsView" class="hidden"><div class="panel"><h2>Editar categorías y sabores</h2><div id="editList"></div><button class="smallbtn" id="addCategory">+ Agregar categoría</button> <button class="smallbtn" id="restore">Restaurar lista original</button></div></section>
+</main>
+<div class="overlay" id="overlay"><div class="keypad">
+<div class="keyhead"><div><div class="muted">EDITANDO SABOR</div><strong id="selectedName">Sabor</strong></div><button class="close" id="closeKey" aria-label="Cerrar">×</button></div>
+<div class="keys"><button data-val="1">1</button><button data-val="1.5">1,5</button><button data-val="0">0</button><button data-val="0.5">0,5</button><button class="clear" id="clearValue">BORRAR</button><button class="enter" id="enterValue">ENTER ↵</button></div>
+</div></div>
+<script>
+const original=[
+["CHOCOLATES",["Semi amargo","Amargo","Con almendras","Argentino","Con frutos rojos","Marroc","Con menta","Rasta"]],
+["DULCE DE LECHE",["Dulce de LECHE","Dulce con nuez","Dulce tentación","Dulce granizado","Dulce bombom"]],
+["CREMAS",["Americana","Vainilla","Pistacho","Frutos de bosque","Banana split","Crema frantina","Oreo","Tramontana","Granizado","Menta granizada","Maracuya","Sambayon","Cereza","Mascarpone","Frutilla crema","Café con chocolate","Mousse de limón","Cielo","Flan","Serenito","Bananita dolca","Maicena","Marquisse"]],
+["AL AGUA",["Limón","Frutilla","Ananá","Limón Patagonico","Naranja mango"]]
+];
+const clone=x=>JSON.parse(JSON.stringify(x)), keyCat="control_latas_catalog_v3",keyCounts="control_latas_history_v3";
+let catalog=read(keyCat,original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))})));
+let history=read(keyCounts,{}), selected=null;
+function uid(){return "x"+Math.random().toString(36).slice(2,10)}
+function read(k,f){try{let x=JSON.parse(localStorage.getItem(k));return x??clone(f)}catch{return clone(f)}}
+function save(){localStorage.setItem(keyCat,JSON.stringify(catalog));localStorage.setItem(keyCounts,JSON.stringify(history))}
+const dateEl=document.querySelector("#date");dateEl.value=localDate(); if(!dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
+function localDate(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function entries(){return catalog.flatMap(c=>c.items.map(f=>({...f,category:c.name})))}
+function day(){return history[dateEl.value]||(history[dateEl.value]={})}
+function fmt(v){return v===undefined?"—":String(v).replace(".",",")}
+function renderCount(){
+let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;
+document.querySelector("#progressText").textContent=`${done} / ${all.length}`;
+document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";
+document.querySelector("#catalogList").innerHTML=catalog.map(c=>`<section class="cat"><h2>${esc(c.name)}</h2>${c.items.map(f=>`<div class="flavor"><span class="name">${esc(f.label)}</span><button class="amount ${values[f.id]===undefined?"empty":""}" data-id="${f.id}">${fmt(values[f.id])}</button></div>`).join("")}</section>`).join("");
+document.querySelectorAll(".amount").forEach(b=>b.onclick=()=>openKey(b.dataset.id));
+}
+function openKey(id){selected=id;let f=entries().find(x=>x.id===id);document.querySelector("#selectedName").textContent=f?.label||"Sabor";document.querySelector("#overlay").classList.add("show")}
+function closeKey(){document.querySelector("#overlay").classList.remove("show");selected=null;renderCount();save()}
+document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){day()[selected]=Number(b.dataset.val);save();}});
+document.querySelector("#clearValue").onclick=()=>{if(selected)delete day()[selected];save()};
+document.querySelector("#enterValue").onclick=closeKey;
+document.querySelector("#closeKey").onclick=closeKey;
+document.querySelector("#overlay").onclick=e=>{if(e.target.id==="overlay")closeKey()};
+dateEl.onchange=renderCount;
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
+function renderHistory(){let dates=Object.keys(history).filter(d=>Object.keys(history[d]||{}).length).sort().reverse();document.querySelector("#historyList").innerHTML=dates.length?dates.map(d=>`<div class="history-row"><div><strong>${new Date(d+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}</strong><div class="muted">${Object.keys(history[d]).length} sabores cargados</div></div><div><button class="smallbtn" data-open="${d}">Ver / editar</button> <button class="smallbtn" data-del="${d}">×</button></div></div>`).join(""):'<p class="muted">Todavía no hay conteos guardados.</p>';
+document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{dateEl.value=b.dataset.open;document.querySelector('[data-view="count"]').click();renderCount()});
+document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este conteo?")){delete history[b.dataset.del];save();renderHistory()}})}
+function renderEdit(){document.querySelector("#editList").innerHTML=catalog.map((c,ci)=>`<section class="cat"><div class="editrow"><input data-cat="${ci}" value="${esc(c.name)}"><button class="smallbtn" data-upcat="${ci}">↑</button><button class="smallbtn" data-downcat="${ci}">↓</button><button class="smallbtn" data-delcat="${ci}">×</button></div>${c.items.map((f,fi)=>`<div class="editrow"><input data-flavor="${ci},${fi}" value="${esc(f.label)}"><button class="smallbtn" data-up="${ci},${fi}">↑</button><button class="smallbtn" data-down="${ci},${fi}">↓</button><button class="smallbtn" data-delf="${ci},${fi}">×</button></div>`).join("")}<button class="smallbtn" data-add="${ci}">+ Agregar sabor</button></section>`).join("");
+document.querySelectorAll("[data-cat]").forEach(x=>x.onchange=()=>{catalog[+x.dataset.cat].name=x.value.toUpperCase();save()});
+document.querySelectorAll("[data-flavor]").forEach(x=>x.onchange=()=>{let [c,f]=x.dataset.flavor.split(",").map(Number);catalog[c].items[f].label=x.value;save()});
+document.querySelectorAll("[data-up],[data-down]").forEach(x=>x.onclick=()=>{let [c,f]=x.dataset[x.hasAttribute("data-up")?"up":"down"].split(",").map(Number),n=f+(x.hasAttribute("data-up")?-1:1);if(n>=0&&n<catalog[c].items.length){[catalog[c].items[f],catalog[c].items[n]]=[catalog[c].items[n],catalog[c].items[f]];save();renderEdit()}});
+document.querySelectorAll("[data-add]").forEach(x=>x.onclick=()=>{let name=prompt("Nombre del sabor");if(name){catalog[+x.dataset.add].items.push({id:uid(),label:name});save();renderEdit()}});
+document.querySelectorAll("[data-delf]").forEach(x=>x.onclick=()=>{let [c,f]=x.dataset.delf.split(",").map(Number);if(confirm("¿Eliminar sabor?")){catalog[c].items.splice(f,1);save();renderEdit()}});
+document.querySelectorAll("[data-upcat],[data-downcat]").forEach(x=>x.onclick=()=>{let i=+(x.dataset.upcat??x.dataset.downcat),n=i+(x.hasAttribute("data-upcat")?-1:1);if(n>=0&&n<catalog.length){[catalog[i],catalog[n]]=[catalog[n],catalog[i]];save();renderEdit()}});
+document.querySelectorAll("[data-delcat]").forEach(x=>x.onclick=()=>{let i=+x.dataset.delcat;if(confirm("¿Eliminar categoría y sus sabores?")){catalog.splice(i,1);save();renderEdit()}});
+}
+document.querySelector("#addCategory").onclick=()=>{let name=prompt("Nombre de categoría");if(name){catalog.push({id:uid(),name:name.toUpperCase(),items:[]});save();renderEdit()}};
+document.querySelector("#restore").onclick=()=>{if(confirm("¿Restaurar los 41 sabores originales?")){catalog=original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))}));save();renderEdit();renderCount()}};
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+renderCount();
+</script></body></html>
