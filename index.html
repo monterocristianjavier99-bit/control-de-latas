@@ -182,7 +182,7 @@ document.querySelector("#downloadPdf").addEventListener("click",async()=>{
    if(await ensurePdfLibrary()){
      const {jsPDF}=window.jspdf;
      const doc=new jsPDF({unit:"mm",format:"a4"});
-     const left=15,right=195;let y=18;
+     const left=32,right=178;let y=18;
      doc.setFont("helvetica","bold");doc.setFontSize(18);doc.text("CONTROL DE LATAS",left,y);y+=8;
      doc.setFont("helvetica","normal");doc.setFontSize(10);doc.text("Fecha: "+dateText,left,y);y+=7;
      doc.setFont("helvetica","bold");doc.text("SABOR",left,y);doc.text("CANTIDAD",right,y,{align:"right"});y+=3;
