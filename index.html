@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#293b35"><title>CONTROL DE LATAS</title>
+<meta name="theme-color" content="#34495e"><title>CONTROL DE LATAS</title>
 <style>
-:root{--ink:#293b35;--paper:#f6f0e3;--card:#fffdf7;--line:#ded6c5;--muted:#78817b;--soft:#e9eee9;--red:#b45248}
-*{box-sizing:border-box}html,body,button{touch-action:manipulation}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,sans-serif}
+:root{--ink:#34495e;--paper:#f6f0e3;--card:#fffdf7;--line:#ded6c5;--muted:#78817b;--soft:#e9eee9;--red:#b45248}
+*{box-sizing:border-box;touch-action:manipulation}html,body,button{touch-action:manipulation}html{-webkit-text-size-adjust:100%;overscroll-behavior-y:contain}button,.amount{ -webkit-tap-highlight-color:transparent; }body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,sans-serif}
 header{background:var(--ink);color:white;padding:calc(env(safe-area-inset-top) + 18px) 18px 18px;border-radius:0 0 28px 28px}
 h1{font-size:25px;margin:0 0 14px;font-weight:850;letter-spacing:.02em}
 nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{font:inherit;border:0;cursor:pointer}
@@ -90,13 +90,14 @@ function entries(){return catalog.flatMap(c=>c.items.map(f=>({...f,category:c.na
 function day(){return history[dateEl.value]||(history[dateEl.value]={})}
 function fmt(v){return v===undefined?"—":String(v).replace(".",",")}
 function renderCount(){
+const panel=document.querySelector("#keypadPanel"),list=document.querySelector("#catalogList");
+// Move the keypad out before rebuilding the flavor list, otherwise innerHTML would destroy it.
+if(panel && list.contains(panel)) list.insertAdjacentElement("afterend",panel);
 let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;
 document.querySelector("#progressText").textContent=`${done} / ${all.length}`;
 document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";
-document.querySelector("#catalogList").innerHTML=catalog.map(c=>`<section class="cat"><h2>${esc(c.name)}</h2>${c.items.map(f=>`<div class="flavor" data-row="${f.id}"><span class="name">${esc(f.label)}</span><button class="amount ${values[f.id]===undefined?"empty":""}" data-id="${f.id}">${fmt(values[f.id])}</button></div>`).join("")}</section>`).join("");
+list.innerHTML=catalog.map(c=>`<section class="cat"><h2>${esc(c.name)}</h2>${c.items.map(f=>`<div class="flavor" data-row="${f.id}"><span class="name">${esc(f.label)}</span><button class="amount ${values[f.id]===undefined?"empty":""}" data-id="${f.id}">${fmt(values[f.id])}</button></div>`).join("")}</section>`).join("");
 document.querySelectorAll(".amount").forEach(b=>b.onclick=()=>openKey(b.dataset.id));
-// Keep the keypad directly under the selected flavor, without scrolling or covering the page.
-const panel=document.querySelector("#keypadPanel");
 if(selected){const row=document.querySelector(`[data-row="${CSS.escape(selected)}"]`);if(row){row.insertAdjacentElement("afterend",panel);panel.classList.add("show");}else{panel.classList.remove("show");}}
 }
 function openKey(id){selected=id;let f=entries().find(x=>x.id===id);document.querySelector("#selectedName").textContent=f?.label||"Sabor";renderCount();}
@@ -108,8 +109,13 @@ function enterNext(){
  const all=entries();
  const index=all.findIndex(f=>f.id===selected);
  const next=all[index+1];
- if(next){openKey(next.id);}
- else{closeKey();}
+ if(!next){closeKey();return;}
+ // Keep the existing keypad node alive and move it under the next flavor without rebuilding the list.
+ selected=next.id;
+ document.querySelector("#selectedName").textContent=next.label;
+ const nextRow=document.querySelector(`[data-row="${CSS.escape(next.id)}"]`);
+ const panel=document.querySelector("#keypadPanel");
+ if(nextRow && panel){nextRow.insertAdjacentElement("afterend",panel);panel.classList.add("show");nextRow.scrollIntoView({block:"nearest",behavior:"smooth"});}
 }
 document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){const current=day()[selected]??0;day()[selected]=Math.round((current+Number(b.dataset.val))*10)/10;save();updateSelectedAmount();}});
 document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[selected];save();updateSelectedAmount();}};
