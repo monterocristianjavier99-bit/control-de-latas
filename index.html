@@ -85,7 +85,8 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 <section id="historyView" class="hidden"><div class="panel"><h2>Historial de conteos</h2><div id="historyList"></div></div></section>
 <section id="flavorsView" class="hidden"><div class="panel"><h2>Editar categorías y sabores</h2><div id="editList"></div><button class="smallbtn" id="addCategory">+ Agregar categoría</button> <button class="smallbtn" id="restore">Restaurar lista original</button></div></section>
 </main>
-<script>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const original=[
 ["CHOCOLATES",["Semi amargo","Amargo","Con almendras","Argentino","Con frutos rojos","Marroc","Con menta","Rasta"]],
 ["DULCE DE LECHE",["Dulce de LECHE","Dulce con nuez","Dulce tentación","Dulce granizado","Dulce bombom"]],
@@ -94,7 +95,7 @@ const original=[
 ];
 const SUPABASE_URL="https://oqhqeewnkfqynmkpmwyq.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_tftZTAUdm4giuWfzNSgjNA_UrVPiDdW";
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const clone=x=>JSON.parse(JSON.stringify(x)), keyCat="control_latas_catalog_v3",keyCounts="control_latas_history_v3";
 let catalog=read(keyCat,original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))})));
 let history=read(keyCounts,{}), selected=null, cloudReady=false, saveTimer=null, applyingRemote=false, realtimeChannel=null;
@@ -107,8 +108,23 @@ function applyCloudRow(row){applyingRemote=true;catalog=Array.isArray(row.catalo
 async function initializeCloud(){setSyncState("Cargando inventario compartido…");const {data:row,error}=await supabase.from("control_latas_data").select("id,catalog,history,updated_at").eq("id",1).maybeSingle();if(error){setSyncState("Error de lectura: "+error.message);throw error}if(row){applyCloudRow(row)}else{const {error:insertError}=await supabase.from("control_latas_data").insert({id:1,catalog,history});if(insertError)throw insertError;setSyncState("Inventario inicial guardado")};cloudReady=true;if(realtimeChannel)await supabase.removeChannel(realtimeChannel);realtimeChannel=supabase.channel("control-latas-live").on("postgres_changes",{event:"UPDATE",schema:"public",table:"control_latas_data",filter:"id=eq.1"},payload=>{if(payload.new&&cloudReady){clearTimeout(saveTimer);applyCloudRow(payload.new)}}).subscribe();setSyncState("Sincronizado")}
 function showApp(user){document.querySelector("#authGate").classList.add("hidden");document.querySelector("#appShell").classList.remove("hidden");document.querySelector("#accountEmail").textContent=user.email||"Cuenta compartida"}
 function showAuth(message=""){document.querySelector("#appShell").classList.add("hidden");document.querySelector("#authGate").classList.remove("hidden");document.querySelector("#authMessage").textContent=message}
-async function authAction(mode){const email=document.querySelector("#authEmail").value.trim(),password=document.querySelector("#authPassword").value;const msg=document.querySelector("#authMessage");if(!email||!password){msg.textContent="Ingresá tu correo y contraseña.";return}if(password.length<6){msg.textContent="La contraseña debe tener al menos 6 caracteres.";return}msg.textContent=mode==="signup"?"Creando cuenta…":"Ingresando…";const result=mode==="signup"?await supabase.auth.signUp({email,password}):await supabase.auth.signInWithPassword({email,password});if(result.error){msg.textContent=result.error.message;return}if(mode==="signup"&&!result.data.session){msg.textContent="Cuenta creada. Revisá tu correo y confirmá el registro; después volvé e iniciá sesión.";return}if(result.data.user){showApp(result.data.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}}
-document.querySelector("#signInBtn").onclick=()=>authAction("signin");document.querySelector("#signUpBtn").onclick=()=>authAction("signup");document.querySelector("#signOutBtn").onclick=async()=>{cloudReady=false;clearTimeout(saveTimer);if(realtimeChannel)await supabase.removeChannel(realtimeChannel);await supabase.auth.signOut();showAuth("Sesión cerrada.")};
+async function authAction(mode){
+ const email=document.querySelector("#authEmail").value.trim(),password=document.querySelector("#authPassword").value;
+ const msg=document.querySelector("#authMessage"),buttons=[document.querySelector("#signInBtn"),document.querySelector("#signUpBtn")];
+ if(!email||!password){msg.textContent="Ingresá tu correo y contraseña.";return}
+ if(password.length<6){msg.textContent="La contraseña debe tener al menos 6 caracteres.";return}
+ buttons.forEach(b=>b.disabled=true);
+ msg.style.color="var(--muted)";msg.textContent=mode==="signup"?"Creando cuenta…":"Ingresando…";
+ try{
+  const result=mode==="signup"?await supabase.auth.signUp({email,password}):await supabase.auth.signInWithPassword({email,password});
+  if(result.error){msg.style.color="var(--red)";msg.textContent=result.error.message;return}
+  if(mode==="signup"&&!result.data.session){msg.style.color="var(--ink)";msg.textContent="Cuenta creada. Revisá tu correo y confirmá el registro; después volvé e iniciá sesión.";return}
+  if(result.data.user){showApp(result.data.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);msg.style.color="var(--red)";alert("No se pudo conectar con el inventario: "+e.message)}}
+ }catch(error){msg.style.color="var(--red)";msg.textContent="No se pudo conectar con Supabase: "+(error?.message||String(error));console.error(error)}
+ finally{buttons.forEach(b=>b.disabled=false)}
+}
+document.querySelector("#signInBtn").addEventListener("click",()=>authAction("signin"));
+document.querySelector("#signUpBtn").addEventListener("click",()=>authAction("signup"));document.querySelector("#signOutBtn").onclick=async()=>{cloudReady=false;clearTimeout(saveTimer);if(realtimeChannel)await supabase.removeChannel(realtimeChannel);await supabase.auth.signOut();showAuth("Sesión cerrada.")};
 (async()=>{const {data}=await supabase.auth.getSession();if(data.session?.user){showApp(data.session.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}else showAuth()})();
 supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")showAuth()});
 const dateEl=document.querySelector("#date");dateEl.value=localDate(); if(!dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
