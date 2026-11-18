@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#34495e"><title>CONTROL DE LATAS</title>
+<style>
+:root{--ink:#34495e;--paper:#f6f0e3;--card:#fffdf7;--line:#ded6c5;--muted:#78817b;--soft:#e9eee9;--red:#b45248}
+*{box-sizing:border-box;touch-action:manipulation}html,body,button{touch-action:manipulation}html{-webkit-text-size-adjust:100%;overscroll-behavior-y:contain}button,.amount{ -webkit-tap-highlight-color:transparent; }body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,sans-serif}
+header{background:var(--ink);color:white;padding:calc(env(safe-area-inset-top) + 18px) 18px 18px;border-radius:0 0 28px 28px}
+h1{font-size:25px;margin:0 0 14px;font-weight:850;letter-spacing:.02em}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{font:inherit;border:0;cursor:pointer}
+nav button{padding:12px 5px;border-radius:14px;background:#e6e9e3;color:var(--ink);font-weight:750}
+nav button.active{background:#fff;color:var(--ink)}
+main{max-width:650px;margin:auto;padding:16px 14px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px}
+input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);max-width:170px}
+.download-btn{padding:11px 13px;border-radius:12px;background:var(--ink);color:#fff;font-weight:800;white-space:nowrap}
+.progress{height:7px;background:#e5e9e3;border-radius:20px;overflow:hidden;margin:0 0 16px}.progress i{display:block;height:100%;background:var(--ink)}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px;margin:0 0 14px}
+.cat h2{font-size:16px;margin:0 0 6px;padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:#f8f1df}
+.flavor{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:10px;align-items:center;padding:8px 5px;border-bottom:1px solid #eee9df;min-height:54px}
+.flavor:last-child{border-bottom:0}.name{font-size:16px;font-weight:550}
+.amount{min-height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:center;font-size:20px;font-weight:800;color:var(--ink);display:grid;place-items:center}
+.amount.empty{color:#9aa19c;font-weight:500}
+.hint{font-size:12px;color:var(--muted);margin:10px 3px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:12px}
+.panel h2{font-size:17px;margin:0 0 12px}
+.history-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.smallbtn{padding:8px 11px;border-radius:10px;background:var(--soft);font-weight:700;color:var(--ink)}
+.editrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px;align-items:center;margin:7px 0}
+.editrow input{min-width:0;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit}
+.keypad-panel{display:none;width:100%;margin:12px 0 16px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:none}
+.keypad-panel.show{display:block}.keypad{width:100%}
+.keyhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.keyhead strong{font-size:18px}.close{background:#e8ece7;border-radius:50%;width:38px;height:38px;font-size:22px}
+.keys{display:grid;grid-template-columns:1fr 1fr;gap:10px}.keys button{height:76px;border-radius:18px;background:#edf0eb;color:var(--ink);font-size:32px;font-weight:850}
+.keys .clear{background:#f6e9e5;color:var(--red);font-size:20px}.keys .enter{background:var(--ink);color:white;font-size:22px}
+.hidden{display:none!important}.muted{color:var(--muted);font-size:13px}
+#authGate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:grid;place-items:center;padding:22px}#authCard{width:min(100%,430px);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 12px 36px #0001}#authCard h2{margin:0 0 8px;font-size:22px}#authCard p{color:var(--muted);font-size:14px;line-height:1.45}#authCard label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}#authCard input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;background:white;color:var(--ink)}#authActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}#authActions button{padding:12px 8px;border-radius:12px;font-weight:800;background:var(--ink);color:white}#authActions button.secondary{background:#e6e9e3;color:var(--ink)}#authMessage{min-height:20px;margin-top:12px;font-size:13px;color:var(--red)}#accountBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:12px}#accountBar button{padding:7px 10px;border-radius:9px;background:#e6e9e3;color:var(--ink);font-weight:700}#syncState{color:var(--muted);font-size:11px}#appShell.hidden{display:none!important}
+@media print{
+ @page{size:A4;margin:14mm}
+ body{background:#fff;color:#111;font-size:11pt}
+ header,nav,.top,.progress,.hint,#keypadPanel,#historyView,#flavorsView{display:none!important}
+ main{max-width:none;margin:0;padding:0}
+ #countView{display:block!important}
+ #catalogList{display:block!important}
+ .cat{break-inside:avoid;border:0;border-radius:0;padding:0;margin:0 0 12px;background:#fff}
+ .cat h2{background:#eee;border:0;border-radius:0;padding:7px 8px;margin:0 0 4px;font-size:12pt}
+ .flavor{min-height:0;padding:4px 8px;grid-template-columns:1fr 90px;border-bottom:1px solid #ddd}
+ .name{font-size:10pt}.amount{border:0;background:transparent;min-height:0;font-size:10pt;display:block;text-align:right;padding:0}
+ #printHeading{display:block!important;margin:0 0 12px}
+}
+#printHeading{display:none}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<section id="authGate">
+ <div id="authCard">
+  <h2>CONTROL DE LATAS</h2>
+  <p>Ingresá con la cuenta compartida para ver y actualizar el mismo inventario desde los dos dispositivos.</p>
+  <label for="authEmail">Correo electrónico</label><input id="authEmail" type="email" autocomplete="email" placeholder="tu correo" required>
+  <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Contraseña" required>
+  <div id="authActions"><button id="signInBtn">Iniciar sesión</button><button class="secondary" id="signUpBtn">Crear cuenta</button></div>
+  <div id="authMessage" role="status"></div>
+ </div>
+</section>
+<div id="appShell" class="hidden">
+<header><h1>CONTROL DE LATAS</h1><nav>
+<button class="active" data-view="count">Conteo</button><button data-view="history">Historial</button><button data-view="flavors">Sabores</button>
+</nav></header>
+<main>
+<div id="accountBar"><span><strong id="accountEmail"></strong><br><span id="syncState">Conectando…</span></span><button id="signOutBtn">Salir</button></div>
+<section id="countView">
+<div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
+<div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">Descargar PDF</button></div>
+<div class="progress"><i id="progressBar" style="width:0%"></i></div>
+<div id="catalogList"></div>
+<p class="hint">Tocá el espacio de cada sabor para abrir el teclado de cantidades.</p>
+<div class="keypad-panel" id="keypadPanel"><div class="keypad">
+<div class="keyhead"><div><div class="muted">EDITANDO SABOR</div><strong id="selectedName">Sabor</strong></div><button class="close" id="closeKey" aria-label="Cerrar">×</button></div>
+<div class="keys"><button data-val="1">1</button><button data-val="1.5">1,5</button><button data-val="0">0</button><button data-val="0.5">0,5</button><button class="clear" id="clearValue">BORRAR</button><button class="enter" id="enterValue">ENTER ↵</button></div>
+</div></div>
+</section>
+<section id="historyView" class="hidden"><div class="panel"><h2>Historial de conteos</h2><div id="historyList"></div></div></section>
+<section id="flavorsView" class="hidden"><div class="panel"><h2>Editar categorías y sabores</h2><div id="editList"></div><button class="smallbtn" id="addCategory">+ Agregar categoría</button> <button class="smallbtn" id="restore">Restaurar lista original</button></div></section>
+</main>
+<script>
+const original=[
+["CHOCOLATES",["Semi amargo","Amargo","Con almendras","Argentino","Con frutos rojos","Marroc","Con menta","Rasta"]],
+["DULCE DE LECHE",["Dulce de LECHE","Dulce con nuez","Dulce tentación","Dulce granizado","Dulce bombom"]],
+["CREMAS",["Americana","Vainilla","Pistacho","Frutos de bosque","Banana split","Crema frantina","Oreo","Tramontana","Granizado","Menta granizada","Maracuya","Sambayon","Cereza","Mascarpone","Frutilla crema","Café con chocolate","Mousse de limón","Cielo","Flan","Serenito","Bananita dolca","Maicena","Marquisse"]],
+["AL AGUA",["Limón","Frutilla","Ananá","Limón Patagonico","Naranja mango"]]
+];
+const SUPABASE_URL="https://oqhqeewnkfqynmkpmwyq.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_tftZTAUdm4giuWfzNSgjNA_UrVPiDdW";
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const clone=x=>JSON.parse(JSON.stringify(x)), keyCat="control_latas_catalog_v3",keyCounts="control_latas_history_v3";
+let catalog=read(keyCat,original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))})));
+let history=read(keyCounts,{}), selected=null, cloudReady=false, saveTimer=null, applyingRemote=false, realtimeChannel=null;
+function uid(){return "x"+Math.random().toString(36).slice(2,10)}
+function read(k,f){try{let x=JSON.parse(localStorage.getItem(k));return x??clone(f)}catch{return clone(f)}}
+function setSyncState(message){const el=document.querySelector("#syncState");if(el)el.textContent=message}
+function save(){localStorage.setItem(keyCat,JSON.stringify(catalog));localStorage.setItem(keyCounts,JSON.stringify(history));if(cloudReady&&!applyingRemote){setSyncState("Guardando cambios…");clearTimeout(saveTimer);saveTimer=setTimeout(pushCloud,350)}}
+async function pushCloud(){if(!cloudReady)return;const payload={id:1,catalog,history,updated_at:new Date().toISOString()};const {error}=await supabase.from("control_latas_data").upsert(payload,{onConflict:"id"});if(error){setSyncState("Error al sincronizar: "+error.message);console.error(error)}else setSyncState("Sincronizado")}
+function applyCloudRow(row){applyingRemote=true;catalog=Array.isArray(row.catalog)&&row.catalog.length?row.catalog:catalog;history=row.history&&typeof row.history==="object"?row.history:history;localStorage.setItem(keyCat,JSON.stringify(catalog));localStorage.setItem(keyCounts,JSON.stringify(history));applyingRemote=false;renderCount();if(!document.querySelector("#historyView").classList.contains("hidden"))renderHistory();if(!document.querySelector("#flavorsView").classList.contains("hidden"))renderEdit();setSyncState("Sincronizado")}
+async function initializeCloud(){setSyncState("Cargando inventario compartido…");const {data:row,error}=await supabase.from("control_latas_data").select("id,catalog,history,updated_at").eq("id",1).maybeSingle();if(error){setSyncState("Error de lectura: "+error.message);throw error}if(row){applyCloudRow(row)}else{const {error:insertError}=await supabase.from("control_latas_data").insert({id:1,catalog,history});if(insertError)throw insertError;setSyncState("Inventario inicial guardado")};cloudReady=true;if(realtimeChannel)await supabase.removeChannel(realtimeChannel);realtimeChannel=supabase.channel("control-latas-live").on("postgres_changes",{event:"UPDATE",schema:"public",table:"control_latas_data",filter:"id=eq.1"},payload=>{if(payload.new&&cloudReady){clearTimeout(saveTimer);applyCloudRow(payload.new)}}).subscribe();setSyncState("Sincronizado")}
+function showApp(user){document.querySelector("#authGate").classList.add("hidden");document.querySelector("#appShell").classList.remove("hidden");document.querySelector("#accountEmail").textContent=user.email||"Cuenta compartida"}
+function showAuth(message=""){document.querySelector("#appShell").classList.add("hidden");document.querySelector("#authGate").classList.remove("hidden");document.querySelector("#authMessage").textContent=message}
+async function authAction(mode){const email=document.querySelector("#authEmail").value.trim(),password=document.querySelector("#authPassword").value;const msg=document.querySelector("#authMessage");if(!email||!password){msg.textContent="Ingresá tu correo y contraseña.";return}if(password.length<6){msg.textContent="La contraseña debe tener al menos 6 caracteres.";return}msg.textContent=mode==="signup"?"Creando cuenta…":"Ingresando…";const result=mode==="signup"?await supabase.auth.signUp({email,password}):await supabase.auth.signInWithPassword({email,password});if(result.error){msg.textContent=result.error.message;return}if(mode==="signup"&&!result.data.session){msg.textContent="Cuenta creada. Revisá tu correo y confirmá el registro; después volvé e iniciá sesión.";return}if(result.data.user){showApp(result.data.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}}
+document.querySelector("#signInBtn").onclick=()=>authAction("signin");document.querySelector("#signUpBtn").onclick=()=>authAction("signup");document.querySelector("#signOutBtn").onclick=async()=>{cloudReady=false;clearTimeout(saveTimer);if(realtimeChannel)await supabase.removeChannel(realtimeChannel);await supabase.auth.signOut();showAuth("Sesión cerrada.")};
+(async()=>{const {data}=await supabase.auth.getSession();if(data.session?.user){showApp(data.session.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}else showAuth()})();
+supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")showAuth()});
+const dateEl=document.querySelector("#date");dateEl.value=localDate(); if(!dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
+function localDate(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function entries(){return catalog.flatMap(c=>c.items.map(f=>({...f,category:c.name})))}
+function day(){return history[dateEl.value]||(history[dateEl.value]={})}
+function fmt(v){return v===undefined?"—":String(v).replace(".",",")}
+function renderCount(){
+const panel=document.querySelector("#keypadPanel"),list=document.querySelector("#catalogList");
+// Move the keypad out before rebuilding the flavor list, otherwise innerHTML would destroy it.
+if(panel && list.contains(panel)) list.insertAdjacentElement("afterend",panel);
+let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;
+document.querySelector("#progressText").textContent=`${done} / ${all.length}`;
+document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";
+list.innerHTML=catalog.map(c=>`<section class="cat"><h2>${esc(c.name)}</h2>${c.items.map(f=>`<div class="flavor" data-row="${f.id}"><span class="name">${esc(f.label)}</span><button class="amount ${values[f.id]===undefined?"empty":""}" data-id="${f.id}">${fmt(values[f.id])}</button></div>`).join("")}</section>`).join("");
+document.querySelectorAll(".amount").forEach(b=>b.onclick=()=>openKey(b.dataset.id));
+if(selected){const row=document.querySelector(`[data-row="${CSS.escape(selected)}"]`);if(row){row.insertAdjacentElement("afterend",panel);panel.classList.add("show");}else{panel.classList.remove("show");}}
+}
+function openKey(id){selected=id;let f=entries().find(x=>x.id===id);document.querySelector("#selectedName").textContent=f?.label||"Sabor";renderCount();}
+function updateSelectedAmount(){if(!selected)return;const value=day()[selected],button=document.querySelector(`.amount[data-id="${CSS.escape(selected)}"]`);if(button){button.textContent=fmt(value);button.classList.toggle("empty",value===undefined);}let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;document.querySelector("#progressText").textContent=`${done} / ${all.length}`;document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";}
+function closeKey(){document.querySelector("#keypadPanel").classList.remove("show");selected=null;save()}
+function enterNext(){
+ if(!selected){closeKey();return;}
+ save();
+ const all=entries();
+ const index=all.findIndex(f=>f.id===selected);
+ const next=all[index+1];
+ if(!next){closeKey();return;}
+ // Keep the existing keypad node alive and move it under the next flavor without rebuilding the list.
+ selected=next.id;
+ document.querySelector("#selectedName").textContent=next.label;
+ const nextRow=document.querySelector(`[data-row="${CSS.escape(next.id)}"]`);
+ const panel=document.querySelector("#keypadPanel");
+ if(nextRow && panel){
+   nextRow.insertAdjacentElement("afterend",panel);
+   panel.classList.add("show");
+   // On iOS Safari, scrollIntoView is more reliable than window.scrollTo when
+   // a keypad panel is reinserted after each row. Wait two frames so layout settles.
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+     panel.scrollIntoView({behavior:"smooth",block:"end",inline:"nearest"});
+     // Fallback for Safari's visual viewport / embedded browser scrolling.
+     setTimeout(()=>{
+       const bottom=panel.getBoundingClientRect().bottom;
+       const visibleBottom=(window.visualViewport?.height||window.innerHeight)-18;
+       if(bottom>visibleBottom){
+         const delta=bottom-visibleBottom;
+         const scroller=document.scrollingElement||document.documentElement;
+         scroller.scrollTop+=delta;
+         window.scrollBy({top:delta,behavior:"smooth"});
+       }
+     },180);
+   }));
+ }
+}
+document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){const current=day()[selected]??0;day()[selected]=Math.round((current+Number(b.dataset.val))*10)/10;save();updateSelectedAmount();}});
+document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[selected];save();updateSelectedAmount();}};
+document.querySelector("#enterValue").onclick=enterNext;
+document.querySelector("#closeKey").onclick=closeKey;
+dateEl.onchange=()=>{selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
+function renderHistory(){let dates=Object.keys(history).filter(d=>Object.keys(history[d]||{}).length).sort().reverse();document.querySelector("#historyList").innerHTML=dates.length?dates.map(d=>`<div class="history-row"><div><strong>${new Date(d+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}</strong><div class="muted">${Object.keys(history[d]).length} sabores cargados</div></div><div><button class="smallbtn" data-open="${d}">Ver / editar</button> <button class="smallbtn" data-del="${d}">×</button></div></div>`).join(""):'<p class="muted">Todavía no hay conteos guardados.</p>';
+document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{dateEl.value=b.dataset.open;document.querySelector('[data-view="count"]').click();renderCount()});
+document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este conteo?")){delete history[b.dataset.del];save();renderHistory()}})}
+function renderEdit(){document.querySelector("#editList").innerHTML=catalog.map((c,ci)=>`<section class="cat"><div class="editrow"><input data-cat="${ci}" value="${esc(c.name)}"><button class="smallbtn" data-upcat="${ci}">↑</button><button class="smallbtn" data-downcat="${ci}">↓</button><button class="smallbtn" data-delcat="${ci}">×</button></div>${c.items.map((f,fi)=>`<div class="editrow"><input data-flavor="${ci},${fi}" value="${esc(f.label)}"><button class="smallbtn" data-up="${ci},${fi}">↑</button><button class="smallbtn" data-down="${ci},${fi}">↓</button><button class="smallbtn" data-delf="${ci},${fi}">×</button></div>`).join("")}<button class="smallbtn" data-add="${ci}">+ Agregar sabor</button></section>`).join("");
+document.querySelectorAll("[data-cat]").forEach(x=>x.onchange=()=>{catalog[+x.dataset.cat].name=x.value.toUpperCase();save()});
+document.querySelectorAll("[data-flavor]").forEach(x=>x.onchange=()=>{let [c,f]=x.dataset.flavor.split(",").map(Number);catalog[c].items[f].label=x.value;save()});
+document.querySelectorAll("[data-up],[data-down]").forEach(x=>x.onclick=()=>{let [c,f]=x.dataset[x.hasAttribute("data-up")?"up":"down"].split(",").map(Number),n=f+(x.hasAttribute("data-up")?-1:1);if(n>=0&&n<catalog[c].items.length){[catalog[c].items[f],catalog[c].items[n]]=[catalog[c].items[n],catalog[c].items[f]];save();renderEdit()}});
+document.querySelectorAll("[data-add]").forEach(x=>x.onclick=()=>{let name=prompt("Nombre del sabor");if(name){catalog[+x.dataset.add].items.push({id:uid(),label:name});save();renderEdit()}});
+document.querySelectorAll("[data-delf]").forEach(x=>x.onclick=()=>{let [c,f]=x.dataset.delf.split(",").map(Number);if(confirm("¿Eliminar sabor?")){catalog[c].items.splice(f,1);save();renderEdit()}});
+document.querySelectorAll("[data-upcat],[data-downcat]").forEach(x=>x.onclick=()=>{let i=+(x.dataset.upcat??x.dataset.downcat),n=i+(x.hasAttribute("data-upcat")?-1:1);if(n>=0&&n<catalog.length){[catalog[i],catalog[n]]=[catalog[n],catalog[i]];save();renderEdit()}});
+document.querySelectorAll("[data-delcat]").forEach(x=>x.onclick=()=>{let i=+x.dataset.delcat;if(confirm("¿Eliminar categoría y sus sabores?")){catalog.splice(i,1);save();renderEdit()}});
+}
+document.querySelector("#addCategory").onclick=()=>{let name=prompt("Nombre de categoría");if(name){catalog.push({id:uid(),name:name.toUpperCase(),items:[]});save();renderEdit()}};
+document.querySelector("#restore").onclick=()=>{if(confirm("¿Restaurar los 41 sabores originales?")){catalog=original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))}));save();renderEdit();renderCount()}};
+
+async function ensurePdfLibrary(){
+ if(window.jspdf?.jsPDF) return true;
+ const sources=[
+  "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js",
+  "https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"
+ ];
+ for(const src of sources){
+  try{await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src=src;script.onload=resolve;script.onerror=reject;document.head.appendChild(script)});if(window.jspdf?.jsPDF)return true;}catch(e){}
+ }
+ return false;
+}
+document.querySelector("#downloadPdf").addEventListener("click",async()=>{
+ const button=document.querySelector("#downloadPdf");
+ const oldLabel=button.textContent;
+ button.textContent="Preparando PDF…";button.disabled=true;
+ const values=day(), all=entries();
+ const total=all.reduce((sum,f)=>sum+(Number(values[f.id])||0),0);
+ const dateText=new Date(dateEl.value+"T12:00:00").toLocaleDateString("es-AR");
+ document.querySelector("#printDate").textContent="Fecha: "+dateText;
+ document.querySelector("#printTotal").textContent="TOTAL GENERAL: "+fmt(total);
+ try{
+   // Preferir descarga directa cuando jsPDF esté disponible.
+   if(await ensurePdfLibrary()){
+     const {jsPDF}=window.jspdf;
+     const doc=new jsPDF({unit:"mm",format:"a4"});
+     const left=15,right=195;let y=18;
+     doc.setFont("helvetica","bold");doc.setFontSize(18);doc.text("CONTROL DE LATAS",left,y);y+=8;
+     doc.setFont("helvetica","normal");doc.setFontSize(10);doc.text("Fecha: "+dateText,left,y);y+=7;
+     doc.setFont("helvetica","bold");doc.text("SABOR",left,y);doc.text("CANTIDAD",right,y,{align:"right"});y+=3;
+     doc.setDrawColor(190);doc.line(left,y,right,y);y+=6;
+     for(const category of catalog){
+       if(y>275){doc.addPage();y=18;}
+       doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text(String(category.name).toUpperCase(),left,y);y+=6;
+       doc.setFont("helvetica","normal");doc.setFontSize(10);
+       for(const flavor of category.items){
+         if(y>280){doc.addPage();y=18;}
+         const amount=values[flavor.id]===undefined?"—":fmt(values[flavor.id]);
+         doc.text(String(flavor.label),left+2,y);doc.text(amount,right,y,{align:"right"});
+         doc.setDrawColor(230);doc.line(left+2,y+2,right,y+2);y+=6;
+       }
+       y+=2;
+     }
+     if(y>280){doc.addPage();y=18;}
+     doc.setFont("helvetica","bold");doc.setFontSize(12);doc.text("TOTAL GENERAL: "+fmt(total),left,y+3);
+     doc.save("Control-de-latas-"+dateEl.value+".pdf");
+   }else{
+     // Fallback compatible con Safari/iPhone: abre la hoja de impresión,
+     // desde Compartir se puede guardar el documento como PDF en Archivos.
+     button.textContent=oldLabel;button.disabled=false;
+     setTimeout(()=>window.print(),120);
+     return;
+   }
+ }catch(error){
+   console.error("Error al generar PDF:",error);
+   button.textContent=oldLabel;button.disabled=false;
+   setTimeout(()=>window.print(),120);
+   return;
+ }
+ button.textContent=oldLabel;button.disabled=false;
+});
+// Prevent iOS Safari's double-tap and gesture zoom while preserving normal scrolling.
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
+document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});
+document.addEventListener("gesturechange",e=>e.preventDefault(),{passive:false});
+document.addEventListener("gestureend",e=>e.preventDefault(),{passive:false});
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+renderCount();
+</script>
+</div></body></html>
