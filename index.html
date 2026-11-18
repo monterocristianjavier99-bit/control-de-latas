@@ -56,6 +56,67 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
  #printHeading{display:block!important;margin:0 0 12px}
 }
 #printHeading{display:none}
+
+/* --- Rediseño visual profesional --- */
+:root{--ink:#243746;--paper:#f3f0e9;--card:#fffefa;--line:#e4ddd0;--muted:#77838a;--soft:#edf1ef;--red:#c66a5d;--accent:#d18a78;--deep:#1d303e;--shadow:0 8px 26px rgba(36,55,70,.07)}
+body{background:linear-gradient(180deg,#e9e6de 0,#f5f2ec 250px,#f3f0e9 100%);color:var(--ink);letter-spacing:.005em}
+header{background:linear-gradient(125deg,#1d303e 0%,#344b5b 58%,#536878 100%);border-radius:0 0 30px 30px;padding:calc(env(safe-area-inset-top) + 22px) 18px 20px;box-shadow:0 10px 28px rgba(29,48,62,.16)}
+header h1{font-size:clamp(22px,5vw,28px);letter-spacing:.045em;margin-bottom:17px}
+header h1:after{content:"INVENTARIO Y CONTROL DIARIO";display:block;margin-top:5px;font-size:10px;letter-spacing:.18em;font-weight:700;color:#d8c8b5}
+nav{gap:9px}
+nav button{background:rgba(255,255,255,.13);color:#f5f2ec;border:1px solid rgba(255,255,255,.12);padding:12px 6px;border-radius:13px;transition:background .18s,transform .18s}
+nav button.active{background:#fffefa;color:var(--deep);box-shadow:0 3px 10px #0002}
+main{max-width:760px;padding:18px 15px 48px}
+#accountBar,.top,.panel,.cat,.keypad-panel{background:rgba(255,254,250,.96);border:1px solid rgba(221,213,199,.9);box-shadow:var(--shadow)}
+#accountBar{border-radius:15px;padding:11px 13px;margin-bottom:15px}
+#accountBar #refreshBtn{background:var(--deep)}
+#accountBar button{border-radius:10px}
+.top{border-radius:19px;padding:15px;margin-bottom:15px}
+.top .muted{font-size:10px;letter-spacing:.11em;font-weight:800;margin-bottom:5px}
+input[type=date]{border-color:var(--line);font-weight:700}
+.download-btn{background:var(--deep);border-radius:12px;box-shadow:0 4px 10px rgba(29,48,62,.12)}
+.progress{height:8px;background:#e4e8e4;border-radius:30px;margin-bottom:19px}
+.progress i{background:linear-gradient(90deg,#344b5b,#d18a78);border-radius:30px;transition:width .2s}
+.cat{border-radius:19px;padding:11px;margin-bottom:14px;overflow:hidden}
+.cat h2{background:linear-gradient(90deg,#f3e9dc,#f8f3ea);border:0;border-left:4px solid var(--accent);border-radius:10px;padding:12px 13px;font-size:13px;letter-spacing:.08em;color:#344b5b}
+.flavor{padding:8px 6px;min-height:58px;border-bottom:1px solid #f0ece5}
+.name{font-size:15px;font-weight:600;color:#344553}
+.amount{min-height:44px;border:1px solid #e5ddd1;border-radius:12px;background:#fff;font-size:19px;box-shadow:0 2px 5px rgba(36,55,70,.035);transition:border .15s,background .15s}
+.amount:not(.empty){background:#f1f5f1;border-color:#cbd8ce;color:#243f37}
+.amount.empty{color:#a5aaa5;background:#fbfaf7}
+.finish-count-btn{margin:20px 0 18px;padding:16px;border-radius:15px;background:linear-gradient(120deg,#b95e54,#d17b6b);box-shadow:0 7px 16px rgba(185,94,84,.2);font-size:14px;letter-spacing:.01em}
+.finish-count-btn:active,.download-btn:active,.smallbtn:active{transform:translateY(1px)}
+.hint{background:#e9eee9;border-radius:10px;padding:10px 12px;line-height:1.45}
+.panel{border-radius:19px;padding:17px}
+.panel h2{font-size:18px;letter-spacing:-.02em}
+.history-row{padding:14px 0;gap:12px}
+.history-row strong{font-size:14px}
+.smallbtn{border:1px solid #dfe4de;border-radius:10px;background:#f0f3ef;padding:9px 11px}
+.keypad-panel{border-radius:18px}
+.keys button{box-shadow:0 2px 6px rgba(36,55,70,.05)}
+.report-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 13px}
+.report-sheet{background:#fffefa;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow)}
+.report-brand{padding-bottom:17px;border-bottom:1px solid var(--line)}
+.report-kicker{font-size:9px;font-weight:850;letter-spacing:.2em;color:var(--accent)}
+.report-brand h1{font-size:24px;margin:7px 0 3px;color:var(--deep)}
+.report-brand p{margin:0;color:var(--muted);font-size:13px}
+.report-meta{display:grid;grid-template-columns:1fr auto;gap:12px;padding:17px 0;border-bottom:1px solid var(--line)}
+.report-meta div{display:flex;flex-direction:column;gap:5px}
+.report-meta span,.report-section-title span,.report-total span{font-size:9px;letter-spacing:.12em;font-weight:800;color:var(--muted)}
+.report-meta strong{font-size:13px;text-transform:capitalize}
+.report-status{color:#347456}
+.report-section-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:19px 0 10px}
+.report-section-title h2{font-size:16px;margin:0}
+.report-category{margin:13px 0 17px;break-inside:avoid}
+.report-category h3{font-size:11px;letter-spacing:.1em;color:#344b5b;background:#f3e9dc;padding:9px 11px;border-radius:9px;margin:0 0 5px}
+.report-line{display:flex;justify-content:space-between;gap:15px;padding:8px 10px;border-bottom:1px solid #eeeae3;font-size:13px}
+.report-line strong{min-width:45px;text-align:right}
+.report-total{display:flex;justify-content:space-between;align-items:center;margin-top:19px;padding:16px;background:#edf2ed;border-radius:13px;color:#28483a}
+.report-total strong{font-size:22px}
+.report-foot{text-align:center;color:var(--muted);font-size:10px;margin:17px 0 0}
+@media(max-width:420px){main{padding-left:11px;padding-right:11px}.top{flex-wrap:wrap}.top>strong{margin-left:auto}.download-btn{padding:10px 11px;font-size:12px}.report-sheet{padding:16px}.report-toolbar .download-btn{font-size:11px}.history-row{align-items:flex-start}}
+@media print{body{background:#fff!important}header,.report-toolbar,#accountBar{display:none!important}main{max-width:none;padding:0}#countView,#historyView,#flavorsView{display:none!important}#completedReportView{display:block!important}#completedReport{border:0;box-shadow:none;border-radius:0;padding:0}.report-category{break-inside:avoid}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -90,6 +151,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 </div></div>
 </section>
 <section id="historyView" class="hidden"><div class="panel"><h2>Historial de conteos</h2><div id="historyList"></div></div></section>
+<section id="completedReportView" class="hidden"><div class="report-toolbar"><button class="smallbtn" id="backToHistory">← Volver al historial</button><button class="download-btn" id="printCompletedReport">Imprimir / Guardar PDF</button></div><div id="completedReport" class="report-sheet"></div></section>
 <section id="flavorsView" class="hidden"><div class="panel"><h2>Editar categorías y sabores</h2><div id="editList"></div><button class="smallbtn" id="addCategory">+ Agregar categoría</button> <button class="smallbtn" id="restore">Restaurar lista original</button></div></section>
 </main>
 <script type="module">
@@ -233,7 +295,7 @@ document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[sel
 document.querySelector("#enterValue").onclick=enterNext;
 document.querySelector("#closeKey").onclick=closeKey;
 dateEl.onchange=()=>{selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="flavors"&&!canEditCatalog())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="flavors"&&!canEditCatalog())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors","completedReport"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
 function renderHistory(){
  const dates=Object.keys(history).filter(d=>!d.startsWith("_")&&Object.keys(history[d]||{}).length).sort().reverse();
  const completed=Array.isArray(history._completed)?history._completed:[];
@@ -242,9 +304,45 @@ function renderHistory(){
  document.querySelector("#historyList").innerHTML=(completedHtml+regularHtml)||'<p class="muted">Todavía no hay conteos guardados.</p>';
  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{dateEl.value=b.dataset.open;document.querySelector('[data-view="count"]').click();renderCount()});
  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este conteo activo?")){delete history[b.dataset.del];save();renderHistory()}});
- document.querySelectorAll("[data-show-completed]").forEach(b=>b.onclick=()=>{const r=completed[+b.dataset.showCompleted];if(!r)return;const lines=entries().map(f=>r.values?.[f.id]!==undefined?`${f.label}: ${fmt(r.values[f.id])}`:null).filter(Boolean);alert("REGISTRO FINALIZADO · "+new Date(r.date+"T12:00").toLocaleDateString("es-AR")+"\\n\\n"+(lines.join("\\n")||"Sin cantidades") + "\\n\\nTOTAL: "+fmt(r.total||0))});
+ document.querySelectorAll("[data-show-completed]").forEach(b=>b.onclick=()=>openCompletedReport(+b.dataset.showCompleted));
  document.querySelectorAll("[data-del-completed]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este registro del historial?")){history._completed.splice(+b.dataset.delCompleted,1);save();renderHistory()}});
 }
+
+function openCompletedReport(index){
+ const records=Array.isArray(history._completed)?history._completed:[];
+ const record=records[index];
+ if(!record)return;
+ const dateText=new Date(record.date+"T12:00:00").toLocaleDateString("es-AR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+ const savedValues=record.values||{};
+ const reportCatalog=Array.isArray(record.catalog)?record.catalog:catalog;
+ const sections=reportCatalog.map(category=>{
+   const rows=category.items.filter(flavor=>savedValues[flavor.id]!==undefined);
+   if(!rows.length)return "";
+   return `<section class="report-category"><h3>${esc(category.name)}</h3>${rows.map(flavor=>`<div class="report-line"><span>${esc(flavor.label)}</span><strong>${fmt(savedValues[flavor.id])}</strong></div>`).join("")}</section>`;
+ }).join("");
+ const total=record.total??Object.values(savedValues).reduce((sum,value)=>sum+(Number(value)||0),0);
+ document.querySelector("#completedReport").innerHTML=
+   `<div class="report-brand"><span class="report-kicker">INVENTARIO · HELADERÍA</span><h1>CONTROL DE LATAS</h1><p>Registro de conteo finalizado</p></div>
+    <div class="report-meta"><div><span>FECHA DEL CONTEO</span><strong>${dateText}</strong></div><div><span>ESTADO</span><strong class="report-status">Finalizado</strong></div></div>
+    <div class="report-section-title"><h2>Detalle del inventario</h2><span>${Object.keys(savedValues).length} sabores cargados</span></div>
+    ${sections||'<p class="muted">Este registro no contiene cantidades.</p>'}
+    <div class="report-total"><span>TOTAL GENERAL</span><strong>${fmt(total)}</strong></div>
+    <p class="report-foot">Documento generado desde CONTROL DE LATAS</p>`;
+ document.querySelector("#countView").classList.add("hidden");
+ document.querySelector("#historyView").classList.add("hidden");
+ document.querySelector("#flavorsView").classList.add("hidden");
+ document.querySelector("#completedReportView").classList.remove("hidden");
+ document.querySelectorAll("nav button").forEach(button=>button.classList.toggle("active",button.dataset.view==="history"));
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelector("#backToHistory").onclick=()=>{
+ document.querySelector("#completedReportView").classList.add("hidden");
+ document.querySelector("#historyView").classList.remove("hidden");
+ renderHistory();
+ window.scrollTo({top:0,behavior:"smooth"});
+};
+document.querySelector("#printCompletedReport").onclick=()=>window.print();
+
 document.querySelector("#finishCountBtn").addEventListener("click",async()=>{
  const values=clone(day());
  const filled=Object.keys(values).length;
@@ -255,7 +353,7 @@ document.querySelector("#finishCountBtn").addEventListener("click",async()=>{
  try{
   const total=Object.values(values).reduce((sum,v)=>sum+(Number(v)||0),0);
   if(!Array.isArray(history._completed))history._completed=[];
-  history._completed.push({date:dateEl.value,values,total,completedAt:new Date().toISOString()});
+  history._completed.push({date:dateEl.value,values,total,catalog:clone(catalog),completedAt:new Date().toISOString()});
   history[dateEl.value]={};
   save();
   clearTimeout(saveTimer);
