@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#34495e"><title>CONTROL DE LATAS</title>
+<meta name="theme-color" content="#34495e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>CONTROL DE LATAS</title>
 <style>
 :root{--ink:#34495e;--paper:#f6f0e3;--card:#fffdf7;--line:#ded6c5;--muted:#78817b;--soft:#e9eee9;--red:#b45248}
 *{box-sizing:border-box;touch-action:manipulation}html,body,button{touch-action:manipulation}html{-webkit-text-size-adjust:100%;overscroll-behavior-y:contain}button,.amount{ -webkit-tap-highlight-color:transparent; }body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,sans-serif}
@@ -16,6 +20,8 @@ main{max-width:650px;margin:auto;padding:16px 14px 40px}
 input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--ink);max-width:170px}
 .download-btn{padding:11px 13px;border-radius:12px;background:var(--ink);color:#fff;font-weight:800;white-space:nowrap}
 .progress{height:7px;background:#e5e9e3;border-radius:20px;overflow:hidden;margin:0 0 16px}.progress i{display:block;height:100%;background:var(--ink)}
+.finish-count-btn{display:block;width:100%;padding:13px 16px;margin:0 0 16px;border-radius:14px;background:#b45248;color:#fff;font-weight:850;font-size:14px}
+.finish-count-btn:disabled{opacity:.6;cursor:wait}
 .cat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px;margin:0 0 14px}
 .cat h2{font-size:16px;margin:0 0 6px;padding:11px 12px;border:1px solid var(--line);border-radius:14px;background:#f8f1df}
 .flavor{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:10px;align-items:center;padding:8px 5px;border-bottom:1px solid #eee9df;min-height:54px}
@@ -75,6 +81,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 <div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
 <div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">Descargar PDF</button></div>
 <div class="progress"><i id="progressBar" style="width:0%"></i></div>
+<button id="finishCountBtn" class="finish-count-btn" type="button">✓ Finalizar conteo y limpiar cantidades</button>
 <div id="catalogList"></div>
 <p class="hint">Tocá el espacio de cada sabor para abrir el teclado de cantidades.</p>
 <div class="keypad-panel" id="keypadPanel"><div class="keypad">
@@ -227,9 +234,45 @@ document.querySelector("#enterValue").onclick=enterNext;
 document.querySelector("#closeKey").onclick=closeKey;
 dateEl.onchange=()=>{selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="flavors"&&!canEditCatalog())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
-function renderHistory(){let dates=Object.keys(history).filter(d=>Object.keys(history[d]||{}).length).sort().reverse();document.querySelector("#historyList").innerHTML=dates.length?dates.map(d=>`<div class="history-row"><div><strong>${new Date(d+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}</strong><div class="muted">${Object.keys(history[d]).length} sabores cargados</div></div><div><button class="smallbtn" data-open="${d}">Ver / editar</button> <button class="smallbtn" data-del="${d}">×</button></div></div>`).join(""):'<p class="muted">Todavía no hay conteos guardados.</p>';
-document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{dateEl.value=b.dataset.open;document.querySelector('[data-view="count"]').click();renderCount()});
-document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este conteo?")){delete history[b.dataset.del];save();renderHistory()}})}
+function renderHistory(){
+ const dates=Object.keys(history).filter(d=>!d.startsWith("_")&&Object.keys(history[d]||{}).length).sort().reverse();
+ const completed=Array.isArray(history._completed)?history._completed:[];
+ const regularHtml=dates.map(d=>`<div class="history-row"><div><strong>${new Date(d+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}</strong><div class="muted">${Object.keys(history[d]).length} sabores cargados · Conteo activo</div></div><div><button class="smallbtn" data-open="${d}">Ver / editar</button> <button class="smallbtn" data-del="${d}">×</button></div></div>`).join("");
+ const completedHtml=completed.slice().reverse().map((r,i)=>`<div class="history-row"><div><strong>${new Date(r.date+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})} · Finalizado</strong><div class="muted">${Object.keys(r.values||{}).length} sabores · Total: ${fmt(r.total||0)}</div></div><div><button class="smallbtn" data-show-completed="${completed.length-1-i}">Ver registro</button> <button class="smallbtn" data-del-completed="${completed.length-1-i}">×</button></div></div>`).join("");
+ document.querySelector("#historyList").innerHTML=(completedHtml+regularHtml)||'<p class="muted">Todavía no hay conteos guardados.</p>';
+ document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{dateEl.value=b.dataset.open;document.querySelector('[data-view="count"]').click();renderCount()});
+ document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este conteo activo?")){delete history[b.dataset.del];save();renderHistory()}});
+ document.querySelectorAll("[data-show-completed]").forEach(b=>b.onclick=()=>{const r=completed[+b.dataset.showCompleted];if(!r)return;const lines=entries().map(f=>r.values?.[f.id]!==undefined?`${f.label}: ${fmt(r.values[f.id])}`:null).filter(Boolean);alert("REGISTRO FINALIZADO · "+new Date(r.date+"T12:00").toLocaleDateString("es-AR")+"\\n\\n"+(lines.join("\\n")||"Sin cantidades") + "\\n\\nTOTAL: "+fmt(r.total||0))});
+ document.querySelectorAll("[data-del-completed]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este registro del historial?")){history._completed.splice(+b.dataset.delCompleted,1);save();renderHistory()}});
+}
+document.querySelector("#finishCountBtn").addEventListener("click",async()=>{
+ const values=clone(day());
+ const filled=Object.keys(values).length;
+ if(!filled){alert("No hay cantidades cargadas para finalizar.");return;}
+ if(!confirm("¿Finalizar este conteo? Se guardará una copia en el Historial y se limpiarán las cantidades de la pantalla para empezar de nuevo."))return;
+ const button=document.querySelector("#finishCountBtn");
+ button.disabled=true;button.textContent="Guardando registro…";
+ try{
+  const total=Object.values(values).reduce((sum,v)=>sum+(Number(v)||0),0);
+  if(!Array.isArray(history._completed))history._completed=[];
+  history._completed.push({date:dateEl.value,values,total,completedAt:new Date().toISOString()});
+  history[dateEl.value]={};
+  save();
+  clearTimeout(saveTimer);
+  await pushCloud();
+  selected=null;
+  document.querySelector("#keypadPanel").classList.remove("show");
+  renderCount();
+  if(!document.querySelector("#historyView").classList.contains("hidden"))renderHistory();
+  setSyncState("Conteo guardado en Historial");
+  alert("¡Conteo guardado en el Historial! Las cantidades quedaron limpias.");
+ }catch(error){
+  setSyncState("Error al guardar: "+(error?.message||String(error)));
+  alert("No se pudo confirmar la sincronización. Revisá tu conexión antes de volver a intentarlo.");
+ }finally{
+  button.disabled=false;button.textContent="✓ Finalizar conteo y limpiar cantidades";
+ }
+});
 function renderEdit(){if(!canEditCatalog())return;document.querySelector("#editList").innerHTML=catalog.map((c,ci)=>`<section class="cat"><div class="editrow"><input data-cat="${ci}" value="${esc(c.name)}"><button class="smallbtn" data-upcat="${ci}">↑</button><button class="smallbtn" data-downcat="${ci}">↓</button><button class="smallbtn" data-delcat="${ci}">×</button></div>${c.items.map((f,fi)=>`<div class="editrow"><input data-flavor="${ci},${fi}" value="${esc(f.label)}"><button class="smallbtn" data-up="${ci},${fi}">↑</button><button class="smallbtn" data-down="${ci},${fi}">↓</button><button class="smallbtn" data-delf="${ci},${fi}">×</button></div>`).join("")}<button class="smallbtn" data-add="${ci}">+ Agregar sabor</button></section>`).join("");
 document.querySelectorAll("[data-cat]").forEach(x=>x.onchange=()=>{catalog[+x.dataset.cat].name=x.value.toUpperCase();save()});
 document.querySelectorAll("[data-flavor]").forEach(x=>x.onchange=()=>{let [c,f]=x.dataset.flavor.split(",").map(Number);catalog[c].items[f].label=x.value;save()});
