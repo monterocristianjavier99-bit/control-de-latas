@@ -35,7 +35,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 .keys{display:grid;grid-template-columns:1fr 1fr;gap:10px}.keys button{height:76px;border-radius:18px;background:#edf0eb;color:var(--ink);font-size:32px;font-weight:850}
 .keys .clear{background:#f6e9e5;color:var(--red);font-size:20px}.keys .enter{background:var(--ink);color:white;font-size:22px}
 .hidden{display:none!important}.muted{color:var(--muted);font-size:13px}
-#authGate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:grid;place-items:center;padding:22px}#authCard{width:min(100%,430px);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 12px 36px #0001}#authCard h2{margin:0 0 8px;font-size:22px}#authCard p{color:var(--muted);font-size:14px;line-height:1.45}#authCard label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}#authCard input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;background:white;color:var(--ink)}#authActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}#authActions button{padding:12px 8px;border-radius:12px;font-weight:800;background:var(--ink);color:white}#authActions button.secondary{background:#e6e9e3;color:var(--ink)}#authMessage{min-height:20px;margin-top:12px;font-size:13px;color:var(--red)}#accountBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:12px}#accountBar button{padding:7px 10px;border-radius:9px;background:#e6e9e3;color:var(--ink);font-weight:700}#syncState{color:var(--muted);font-size:11px}#appShell.hidden{display:none!important}
+#authGate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:grid;place-items:center;padding:22px}#authCard{width:min(100%,430px);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 12px 36px #0001}#authCard h2{margin:0 0 8px;font-size:22px}#authCard p{color:var(--muted);font-size:14px;line-height:1.45}#authCard label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}#authCard input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;background:white;color:var(--ink)}#authActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}#authActions button{padding:12px 8px;border-radius:12px;font-weight:800;background:var(--ink);color:white}#authActions button.secondary{background:#e6e9e3;color:var(--ink)}#authMessage{min-height:20px;margin-top:12px;font-size:13px;color:var(--red)}#accountBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:12px}#accountBar button{padding:7px 10px;border-radius:9px;background:#e6e9e3;color:var(--ink);font-weight:700}#syncState{color:var(--muted);font-size:11px}#roleLabel{display:inline-block;margin-top:3px;font-size:11px;font-weight:800;color:var(--ink);background:#e9eee9;border-radius:7px;padding:2px 7px}#appShell.hidden{display:none!important}
 @media print{
  @page{size:A4;margin:14mm}
  body{background:#fff;color:#111;font-size:11pt}
@@ -70,7 +70,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 <button class="active" data-view="count">Conteo</button><button data-view="history">Historial</button><button data-view="flavors">Sabores</button>
 </nav></header>
 <main>
-<div id="accountBar"><span><strong id="accountEmail"></strong><br><span id="syncState">Conectando…</span></span><button id="signOutBtn">Salir</button></div>
+<div id="accountBar"><span><strong id="accountEmail"></strong><br><span id="roleLabel"></span><br><span id="syncState">Conectando…</span></span><button id="signOutBtn">Salir</button></div>
 <section id="countView">
 <div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
 <div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">Descargar PDF</button></div>
@@ -96,6 +96,15 @@ const original=[
 const SUPABASE_URL="https://oqhqeewnkfqynmkpmwyq.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_tftZTAUdm4giuWfzNSgjNA_UrVPiDdW";
 const supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+// Accesos asignados a las tres cuentas creadas en Supabase.
+const USER_ROLES = {
+  "ac3d4c2b-0076-43b9-8415-e71c861a42e0": { role: "admin", label: "Administrador" },
+  "46520ce3-76fe-48d7-80ee-f2a94f2017d9": { role: "operator", label: "Operador" },
+  "7602afc2-63bd-40f5-95b3-5785dce0f751": { role: "manager", label: "Encargada" }
+};
+let currentRole = null;
+function canEditCatalog(){ return currentRole?.role === "admin"; }
 const clone=x=>JSON.parse(JSON.stringify(x)), keyCat="control_latas_catalog_v3",keyCounts="control_latas_history_v3";
 let catalog=read(keyCat,original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))})));
 let history=read(keyCounts,{}), selected=null, cloudReady=false, saveTimer=null, applyingRemote=false, realtimeChannel=null;
@@ -106,7 +115,21 @@ function save(){localStorage.setItem(keyCat,JSON.stringify(catalog));localStorag
 async function pushCloud(){if(!cloudReady)return;const payload={id:1,catalog,history,updated_at:new Date().toISOString()};const {error}=await supabase.from("control_latas_data").upsert(payload,{onConflict:"id"});if(error){setSyncState("Error al sincronizar: "+error.message);console.error(error)}else setSyncState("Sincronizado")}
 function applyCloudRow(row){applyingRemote=true;catalog=Array.isArray(row.catalog)&&row.catalog.length?row.catalog:catalog;history=row.history&&typeof row.history==="object"?row.history:history;localStorage.setItem(keyCat,JSON.stringify(catalog));localStorage.setItem(keyCounts,JSON.stringify(history));applyingRemote=false;renderCount();if(!document.querySelector("#historyView").classList.contains("hidden"))renderHistory();if(!document.querySelector("#flavorsView").classList.contains("hidden"))renderEdit();setSyncState("Sincronizado")}
 async function initializeCloud(){setSyncState("Cargando inventario compartido…");const {data:row,error}=await supabase.from("control_latas_data").select("id,catalog,history,updated_at").eq("id",1).maybeSingle();if(error){setSyncState("Error de lectura: "+error.message);throw error}if(row){applyCloudRow(row)}else{const {error:insertError}=await supabase.from("control_latas_data").insert({id:1,catalog,history});if(insertError)throw insertError;setSyncState("Inventario inicial guardado")};cloudReady=true;if(realtimeChannel)await supabase.removeChannel(realtimeChannel);realtimeChannel=supabase.channel("control-latas-live").on("postgres_changes",{event:"UPDATE",schema:"public",table:"control_latas_data",filter:"id=eq.1"},payload=>{if(payload.new&&cloudReady){clearTimeout(saveTimer);applyCloudRow(payload.new)}}).subscribe();setSyncState("Sincronizado")}
-function showApp(user){document.querySelector("#authGate").classList.add("hidden");document.querySelector("#appShell").classList.remove("hidden");document.querySelector("#accountEmail").textContent=user.email||"Cuenta compartida"}
+function showApp(user){
+ const access=USER_ROLES[user.id];
+ if(!access){supabase.auth.signOut();showAuth("Esta cuenta no está autorizada para CONTROL DE LATAS.");return false;}
+ currentRole=access;
+ document.querySelector("#authGate").classList.add("hidden");
+ document.querySelector("#appShell").classList.remove("hidden");
+ document.querySelector("#accountEmail").textContent=user.email||"Cuenta";
+ document.querySelector("#roleLabel").textContent=access.label;
+ const flavorsTab=document.querySelector('[data-view="flavors"]');
+ flavorsTab.classList.toggle("hidden",!canEditCatalog());
+ if(!canEditCatalog() && !document.querySelector("#flavorsView").classList.contains("hidden")){
+   document.querySelector('[data-view="count"]').click();
+ }
+ return true;
+}
 function showAuth(message=""){document.querySelector("#appShell").classList.add("hidden");document.querySelector("#authGate").classList.remove("hidden");document.querySelector("#authMessage").textContent=message}
 async function authAction(mode){
  const email=document.querySelector("#authEmail").value.trim(),password=document.querySelector("#authPassword").value;
@@ -119,13 +142,13 @@ async function authAction(mode){
   const result=mode==="signup"?await supabase.auth.signUp({email,password}):await supabase.auth.signInWithPassword({email,password});
   if(result.error){msg.style.color="var(--red)";msg.textContent=result.error.message;return}
   if(mode==="signup"&&!result.data.session){msg.style.color="var(--ink)";msg.textContent="Cuenta creada. Revisá tu correo y confirmá el registro; después volvé e iniciá sesión.";return}
-  if(result.data.user){showApp(result.data.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);msg.style.color="var(--red)";alert("No se pudo conectar con el inventario: "+e.message)}}
+  if(result.data.user && showApp(result.data.user)){try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);msg.style.color="var(--red)";alert("No se pudo conectar con el inventario: "+e.message)}}
  }catch(error){msg.style.color="var(--red)";msg.textContent="No se pudo conectar con Supabase: "+(error?.message||String(error));console.error(error)}
  finally{buttons.forEach(b=>b.disabled=false)}
 }
 document.querySelector("#signInBtn").addEventListener("click",()=>authAction("signin"));
-document.querySelector("#signUpBtn").addEventListener("click",()=>authAction("signup"));document.querySelector("#signOutBtn").onclick=async()=>{cloudReady=false;clearTimeout(saveTimer);if(realtimeChannel)await supabase.removeChannel(realtimeChannel);await supabase.auth.signOut();showAuth("Sesión cerrada.")};
-(async()=>{const {data}=await supabase.auth.getSession();if(data.session?.user){showApp(data.session.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}else showAuth()})();
+document.querySelector("#signUpBtn").addEventListener("click",()=>authAction("signup"));document.querySelector("#signOutBtn").onclick=async()=>{cloudReady=false;currentRole=null;clearTimeout(saveTimer);if(realtimeChannel)await supabase.removeChannel(realtimeChannel);await supabase.auth.signOut();showAuth("Sesión cerrada.")};
+(async()=>{const {data}=await supabase.auth.getSession();if(data.session?.user && showApp(data.session.user)){try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}else showAuth()})();
 supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")showAuth()});
 const dateEl=document.querySelector("#date");dateEl.value=localDate(); if(!dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
 function localDate(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
@@ -184,11 +207,11 @@ document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[sel
 document.querySelector("#enterValue").onclick=enterNext;
 document.querySelector("#closeKey").onclick=closeKey;
 dateEl.onchange=()=>{selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="flavors"&&!canEditCatalog())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
 function renderHistory(){let dates=Object.keys(history).filter(d=>Object.keys(history[d]||{}).length).sort().reverse();document.querySelector("#historyList").innerHTML=dates.length?dates.map(d=>`<div class="history-row"><div><strong>${new Date(d+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}</strong><div class="muted">${Object.keys(history[d]).length} sabores cargados</div></div><div><button class="smallbtn" data-open="${d}">Ver / editar</button> <button class="smallbtn" data-del="${d}">×</button></div></div>`).join(""):'<p class="muted">Todavía no hay conteos guardados.</p>';
 document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{dateEl.value=b.dataset.open;document.querySelector('[data-view="count"]').click();renderCount()});
 document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este conteo?")){delete history[b.dataset.del];save();renderHistory()}})}
-function renderEdit(){document.querySelector("#editList").innerHTML=catalog.map((c,ci)=>`<section class="cat"><div class="editrow"><input data-cat="${ci}" value="${esc(c.name)}"><button class="smallbtn" data-upcat="${ci}">↑</button><button class="smallbtn" data-downcat="${ci}">↓</button><button class="smallbtn" data-delcat="${ci}">×</button></div>${c.items.map((f,fi)=>`<div class="editrow"><input data-flavor="${ci},${fi}" value="${esc(f.label)}"><button class="smallbtn" data-up="${ci},${fi}">↑</button><button class="smallbtn" data-down="${ci},${fi}">↓</button><button class="smallbtn" data-delf="${ci},${fi}">×</button></div>`).join("")}<button class="smallbtn" data-add="${ci}">+ Agregar sabor</button></section>`).join("");
+function renderEdit(){if(!canEditCatalog())return;document.querySelector("#editList").innerHTML=catalog.map((c,ci)=>`<section class="cat"><div class="editrow"><input data-cat="${ci}" value="${esc(c.name)}"><button class="smallbtn" data-upcat="${ci}">↑</button><button class="smallbtn" data-downcat="${ci}">↓</button><button class="smallbtn" data-delcat="${ci}">×</button></div>${c.items.map((f,fi)=>`<div class="editrow"><input data-flavor="${ci},${fi}" value="${esc(f.label)}"><button class="smallbtn" data-up="${ci},${fi}">↑</button><button class="smallbtn" data-down="${ci},${fi}">↓</button><button class="smallbtn" data-delf="${ci},${fi}">×</button></div>`).join("")}<button class="smallbtn" data-add="${ci}">+ Agregar sabor</button></section>`).join("");
 document.querySelectorAll("[data-cat]").forEach(x=>x.onchange=()=>{catalog[+x.dataset.cat].name=x.value.toUpperCase();save()});
 document.querySelectorAll("[data-flavor]").forEach(x=>x.onchange=()=>{let [c,f]=x.dataset.flavor.split(",").map(Number);catalog[c].items[f].label=x.value;save()});
 document.querySelectorAll("[data-up],[data-down]").forEach(x=>x.onclick=()=>{let [c,f]=x.dataset[x.hasAttribute("data-up")?"up":"down"].split(",").map(Number),n=f+(x.hasAttribute("data-up")?-1:1);if(n>=0&&n<catalog[c].items.length){[catalog[c].items[f],catalog[c].items[n]]=[catalog[c].items[n],catalog[c].items[f]];save();renderEdit()}});
@@ -197,8 +220,8 @@ document.querySelectorAll("[data-delf]").forEach(x=>x.onclick=()=>{let [c,f]=x.d
 document.querySelectorAll("[data-upcat],[data-downcat]").forEach(x=>x.onclick=()=>{let i=+(x.dataset.upcat??x.dataset.downcat),n=i+(x.hasAttribute("data-upcat")?-1:1);if(n>=0&&n<catalog.length){[catalog[i],catalog[n]]=[catalog[n],catalog[i]];save();renderEdit()}});
 document.querySelectorAll("[data-delcat]").forEach(x=>x.onclick=()=>{let i=+x.dataset.delcat;if(confirm("¿Eliminar categoría y sus sabores?")){catalog.splice(i,1);save();renderEdit()}});
 }
-document.querySelector("#addCategory").onclick=()=>{let name=prompt("Nombre de categoría");if(name){catalog.push({id:uid(),name:name.toUpperCase(),items:[]});save();renderEdit()}};
-document.querySelector("#restore").onclick=()=>{if(confirm("¿Restaurar los 41 sabores originales?")){catalog=original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))}));save();renderEdit();renderCount()}};
+document.querySelector("#addCategory").onclick=()=>{if(!canEditCatalog())return;let name=prompt("Nombre de categoría");if(name){catalog.push({id:uid(),name:name.toUpperCase(),items:[]});save();renderEdit()}};
+document.querySelector("#restore").onclick=()=>{if(!canEditCatalog())return;if(confirm("¿Restaurar los 41 sabores originales?")){catalog=original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))}));save();renderEdit();renderCount()}};
 
 async function ensurePdfLibrary(){
  if(window.jspdf?.jsPDF) return true;
