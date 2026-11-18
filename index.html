@@ -35,7 +35,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 .keys{display:grid;grid-template-columns:1fr 1fr;gap:10px}.keys button{height:76px;border-radius:18px;background:#edf0eb;color:var(--ink);font-size:32px;font-weight:850}
 .keys .clear{background:#f6e9e5;color:var(--red);font-size:20px}.keys .enter{background:var(--ink);color:white;font-size:22px}
 .hidden{display:none!important}.muted{color:var(--muted);font-size:13px}
-#authGate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:grid;place-items:center;padding:22px}#authCard{width:min(100%,430px);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 12px 36px #0001}#authCard h2{margin:0 0 8px;font-size:22px}#authCard p{color:var(--muted);font-size:14px;line-height:1.45}#authCard label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}#authCard input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;background:white;color:var(--ink)}#authActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}#authActions button{padding:12px 8px;border-radius:12px;font-weight:800;background:var(--ink);color:white}#authActions button.secondary{background:#e6e9e3;color:var(--ink)}#authMessage{min-height:20px;margin-top:12px;font-size:13px;color:var(--red)}#accountBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:12px}#accountBar button{padding:7px 10px;border-radius:9px;background:#e6e9e3;color:var(--ink);font-weight:700}#syncState{color:var(--muted);font-size:11px}#roleLabel{display:inline-block;margin-top:3px;font-size:11px;font-weight:800;color:var(--ink);background:#e9eee9;border-radius:7px;padding:2px 7px}#appShell.hidden{display:none!important}
+#authGate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:grid;place-items:center;padding:22px}#authCard{width:min(100%,430px);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 12px 36px #0001}#authCard h2{margin:0 0 8px;font-size:22px}#authCard p{color:var(--muted);font-size:14px;line-height:1.45}#authCard label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}#authCard input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;background:white;color:var(--ink)}#authActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}#authActions button{padding:12px 8px;border-radius:12px;font-weight:800;background:var(--ink);color:white}#authActions button.secondary{background:#e6e9e3;color:var(--ink)}#authMessage{min-height:20px;margin-top:12px;font-size:13px;color:var(--red)}#accountBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:12px}#accountActions{display:flex;align-items:center;gap:7px;flex-shrink:0}#accountBar button{padding:7px 10px;border-radius:9px;background:#e6e9e3;color:var(--ink);font-weight:700}#accountBar #refreshBtn{background:var(--ink);color:#fff}#accountBar #refreshBtn:disabled{opacity:.6;cursor:wait}#syncState{color:var(--muted);font-size:11px}#roleLabel{display:inline-block;margin-top:3px;font-size:11px;font-weight:800;color:var(--ink);background:#e9eee9;border-radius:7px;padding:2px 7px}#appShell.hidden{display:none!important}
 @media print{
  @page{size:A4;margin:14mm}
  body{background:#fff;color:#111;font-size:11pt}
@@ -70,7 +70,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 <button class="active" data-view="count">Conteo</button><button data-view="history">Historial</button><button data-view="flavors">Sabores</button>
 </nav></header>
 <main>
-<div id="accountBar"><span><strong id="accountEmail"></strong><br><span id="roleLabel"></span><br><span id="syncState">Conectando…</span></span><button id="signOutBtn">Salir</button></div>
+<div id="accountBar"><span><strong id="accountEmail"></strong><br><span id="roleLabel"></span><br><span id="syncState">Conectando…</span></span><div id="accountActions"><button id="refreshBtn" type="button" title="Actualizar datos">↻ Actualizar</button><button id="signOutBtn">Salir</button></div></div>
 <section id="countView">
 <div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
 <div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">Descargar PDF</button></div>
@@ -115,6 +115,24 @@ function save(){localStorage.setItem(keyCat,JSON.stringify(catalog));localStorag
 async function pushCloud(){if(!cloudReady)return;const payload={id:1,catalog,history,updated_at:new Date().toISOString()};const {error}=await supabase.from("control_latas_data").upsert(payload,{onConflict:"id"});if(error){setSyncState("Error al sincronizar: "+error.message);console.error(error)}else setSyncState("Sincronizado")}
 function applyCloudRow(row){applyingRemote=true;catalog=Array.isArray(row.catalog)&&row.catalog.length?row.catalog:catalog;history=row.history&&typeof row.history==="object"?row.history:history;localStorage.setItem(keyCat,JSON.stringify(catalog));localStorage.setItem(keyCounts,JSON.stringify(history));applyingRemote=false;renderCount();if(!document.querySelector("#historyView").classList.contains("hidden"))renderHistory();if(!document.querySelector("#flavorsView").classList.contains("hidden"))renderEdit();setSyncState("Sincronizado")}
 async function initializeCloud(){setSyncState("Cargando inventario compartido…");const {data:row,error}=await supabase.from("control_latas_data").select("id,catalog,history,updated_at").eq("id",1).maybeSingle();if(error){setSyncState("Error de lectura: "+error.message);throw error}if(row){applyCloudRow(row)}else{const {error:insertError}=await supabase.from("control_latas_data").insert({id:1,catalog,history});if(insertError)throw insertError;setSyncState("Inventario inicial guardado")};cloudReady=true;if(realtimeChannel)await supabase.removeChannel(realtimeChannel);realtimeChannel=supabase.channel("control-latas-live").on("postgres_changes",{event:"UPDATE",schema:"public",table:"control_latas_data",filter:"id=eq.1"},payload=>{if(payload.new&&cloudReady){clearTimeout(saveTimer);applyCloudRow(payload.new)}}).subscribe();setSyncState("Sincronizado")}
+async function refreshCloud(){
+ const button=document.querySelector("#refreshBtn");
+ if(!cloudReady){setSyncState("Todavía no está conectado");return}
+ const oldLabel=button.textContent;
+ button.disabled=true;button.textContent="↻ Actualizando…";setSyncState("Actualizando inventario…");
+ try{
+  const {data:row,error}=await supabase.from("control_latas_data").select("id,catalog,history,updated_at").eq("id",1).maybeSingle();
+  if(error)throw error;
+  if(!row)throw new Error("No se encontró el inventario compartido.");
+  applyCloudRow(row);
+  setSyncState("Actualizado correctamente");
+ }catch(error){
+  setSyncState("Error al actualizar: "+(error?.message||String(error)));
+  console.error("Error al actualizar inventario:",error);
+ }finally{
+  button.disabled=false;button.textContent=oldLabel;
+ }
+}
 function showApp(user){
  const access=USER_ROLES[user.id];
  if(!access){supabase.auth.signOut();showAuth("Esta cuenta no está autorizada para CONTROL DE LATAS.");return false;}
@@ -146,6 +164,7 @@ async function authAction(mode){
  }catch(error){msg.style.color="var(--red)";msg.textContent="No se pudo conectar con Supabase: "+(error?.message||String(error));console.error(error)}
  finally{buttons.forEach(b=>b.disabled=false)}
 }
+document.querySelector("#refreshBtn").addEventListener("click",refreshCloud);
 document.querySelector("#signInBtn").addEventListener("click",()=>authAction("signin"));
 document.querySelector("#signUpBtn").addEventListener("click",()=>authAction("signup"));document.querySelector("#signOutBtn").onclick=async()=>{cloudReady=false;currentRole=null;clearTimeout(saveTimer);if(realtimeChannel)await supabase.removeChannel(realtimeChannel);await supabase.auth.signOut();showAuth("Sesión cerrada.")};
 (async()=>{const {data}=await supabase.auth.getSession();if(data.session?.user && showApp(data.session.user)){try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}else showAuth()})();
