@@ -238,6 +238,48 @@ main{max-width:760px;padding:16px 14px 44px}
  header{display:none!important}
 }
 
+
+/* Cuenta y acciones integradas en la barra superior */
+#headerTools{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0}
+#headerTools #accountBar{
+ display:flex!important;align-items:center;justify-content:flex-end;gap:9px;
+ width:auto;min-width:0;margin:0;padding:5px 7px;
+ border:1px solid rgba(255,255,255,.18);border-radius:13px;
+ background:rgba(255,255,255,.10);box-shadow:none;color:#fff;
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+#headerTools #accountBar>span{display:flex;align-items:center;gap:6px;white-space:nowrap;min-width:0}
+#headerTools #accountBar #accountEmail{display:none!important}
+#headerTools #roleLabel{margin:0;background:rgba(255,255,255,.9);color:#263d50;font-size:10px;padding:4px 7px;border-radius:8px}
+#headerTools #syncState{font-size:10px;color:rgba(255,255,255,.78);white-space:nowrap}
+#headerTools #accountActions{gap:5px}
+#headerTools #accountBar button{padding:8px 9px;border-radius:9px;background:rgba(255,255,255,.92);color:#263d50;font-size:10px;font-weight:800;white-space:nowrap}
+#headerTools #accountBar #refreshBtn{background:#fff;color:#263d50}
+#headerTools #accountBar #signOutBtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff}
+@media(max-width:700px){
+ .header-main{align-items:flex-start}
+ #headerTools{flex-direction:column;align-items:stretch;gap:5px}
+ #headerTools .top{width:100%}
+ #headerTools #accountBar{width:100%;justify-content:space-between;padding:4px 6px}
+ #headerTools #accountBar>span{gap:5px}
+}
+@media(max-width:420px){
+ #headerTools #syncState{font-size:9px}
+ #headerTools #accountBar button{padding:7px 8px;font-size:9px}
+ #headerTools #roleLabel{font-size:9px;padding:3px 6px}
+}
+
+
+/* Acción explícita de guardado en el editor de sabores */
+.save-flavors-btn{
+ display:block;width:100%;margin:18px 0 0;padding:15px 16px;
+ border-radius:14px;background:linear-gradient(120deg,#2d5367,#3e7180);
+ color:#fff;font-size:14px;font-weight:850;letter-spacing:.01em;
+ box-shadow:0 6px 15px rgba(45,83,103,.16);
+}
+.save-flavors-btn:disabled{opacity:.65;cursor:wait}
+.save-flavors-note{margin:9px 2px 0;color:var(--muted);font-size:11px;line-height:1.4;text-align:center}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -273,7 +315,7 @@ main{max-width:760px;padding:16px 14px 44px}
 </section>
 <section id="historyView" class="hidden"><div class="panel"><h2>Historial de conteos</h2><div id="historyList"></div></div></section>
 <section id="completedReportView" class="hidden"><div class="report-toolbar"><button class="smallbtn" id="backToHistory">← Volver al historial</button><button class="download-btn" id="printCompletedReport">Imprimir / Guardar PDF</button></div><div id="completedReport" class="report-sheet"></div></section>
-<section id="flavorsView" class="hidden"><div class="panel"><h2>Editar categorías y sabores</h2><div id="editList"></div><button class="smallbtn" id="addCategory">+ Agregar categoría</button> <button class="smallbtn" id="restore">Restaurar lista original</button></div></section>
+<section id="flavorsView" class="hidden"><div class="panel"><h2>Editar categorías y sabores</h2><div id="editList"></div><button class="smallbtn" id="addCategory">+ Agregar categoría</button> <button class="smallbtn" id="restore">Restaurar lista original</button><button class="save-flavors-btn" id="saveFlavorsBtn" type="button">✓ Guardar cambios</button><p class="save-flavors-note">Guardá los cambios para sincronizar los sabores y categorías en todos los dispositivos.</p></div></section>
 </main>
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -364,6 +406,11 @@ supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")showAu
 const countToolbar=document.querySelector("#countToolbar");
 const headerTools=document.querySelector("#headerTools");
 if(countToolbar && headerTools) headerTools.appendChild(countToolbar);
+const accountBar=document.querySelector("#accountBar");
+if(accountBar && headerTools) headerTools.appendChild(accountBar);
+// No mostrar el correo de la cuenta en la interfaz.
+const accountEmail=document.querySelector("#accountEmail");
+if(accountEmail) accountEmail.textContent="";
 
 const dateEl=document.querySelector("#date");dateEl.value=localDate(); if(!dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
 function localDate(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
@@ -509,6 +556,25 @@ document.querySelectorAll("[data-delcat]").forEach(x=>x.onclick=()=>{let i=+x.da
 }
 document.querySelector("#addCategory").onclick=()=>{if(!canEditCatalog())return;let name=prompt("Nombre de categoría");if(name){catalog.push({id:uid(),name:name.toUpperCase(),items:[]});save();renderEdit()}};
 document.querySelector("#restore").onclick=()=>{if(!canEditCatalog())return;if(confirm("¿Restaurar los 41 sabores originales?")){catalog=original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))}));save();renderEdit();renderCount()}};
+
+document.querySelector("#saveFlavorsBtn").onclick=async()=>{
+ if(!canEditCatalog())return;
+ const button=document.querySelector("#saveFlavorsBtn");
+ const oldText=button.textContent;
+ button.disabled=true;button.textContent="Guardando…";
+ try{
+   save();
+   clearTimeout(saveTimer);
+   if(cloudReady) await pushCloud();
+   button.textContent="✓ Cambios guardados";
+   setTimeout(()=>{button.textContent=oldText;button.disabled=false},1600);
+ }catch(error){
+   setSyncState("Error al guardar: "+(error?.message||String(error)));
+   button.textContent="Reintentar guardado";
+   button.disabled=false;
+ }
+};
+
 
 async function ensurePdfLibrary(){
  if(window.jspdf?.jsPDF) return true;
