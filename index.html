@@ -62,7 +62,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 body{background:linear-gradient(180deg,#e9e6de 0,#f5f2ec 250px,#f3f0e9 100%);color:var(--ink);letter-spacing:.005em}
 header{background:linear-gradient(125deg,#1d303e 0%,#344b5b 58%,#536878 100%);border-radius:0 0 30px 30px;padding:calc(env(safe-area-inset-top) + 22px) 18px 20px;box-shadow:0 10px 28px rgba(29,48,62,.16)}
 header h1{font-size:clamp(22px,5vw,28px);letter-spacing:.045em;margin-bottom:17px}
-header h1:after{content:"INVENTARIO Y CONTROL DIARIO";display:block;margin-top:5px;font-size:10px;letter-spacing:.18em;font-weight:700;color:#d8c8b5}
+
 nav{gap:9px}
 nav button{background:rgba(255,255,255,.13);color:#f5f2ec;border:1px solid rgba(255,255,255,.12);padding:12px 6px;border-radius:13px;transition:background .18s,transform .18s}
 nav button.active{background:#fffefa;color:var(--deep);box-shadow:0 3px 10px #0002}
@@ -145,6 +145,99 @@ input[type=date]{padding:6px 8px;font-size:12px;max-width:145px;height:34px}
  .top .download-btn{font-size:10px;padding:8px}
 }
 
+
+/* --- Interfaz estilo iPhone --- */
+:root{
+ --ios-bg:#f2f2f7;--ios-card:rgba(255,255,255,.88);--ios-line:rgba(60,60,67,.12);
+ --ios-blue:#263d50;--ios-coral:#c97869;--ios-muted:#8a8a91;
+}
+body{
+ background:linear-gradient(180deg,#e9edf1 0,#f2f2f7 300px,#f2f2f7 100%);
+ color:#1d2730;
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;
+}
+header{
+ padding:calc(env(safe-area-inset-top) + 12px) max(16px,env(safe-area-inset-right)) 14px max(16px,env(safe-area-inset-left));
+ border-radius:0 0 25px 25px;
+ background:linear-gradient(145deg,#1c2e3d,#344c5e);
+ box-shadow:0 8px 28px rgba(25,43,57,.16);
+}
+.header-main{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ min-height:62px;margin:0 auto 12px;max-width:760px;
+}
+.brand-icon{
+ display:block;width:58px;height:58px;object-fit:contain;border-radius:17px;
+ box-shadow:0 5px 15px rgba(0,0,0,.18);background:#fff;
+}
+.header-tools{flex:1;min-width:0;display:flex;justify-content:flex-end}
+header nav{max-width:760px;margin:0 auto;gap:8px}
+header nav button{
+ min-height:42px;border-radius:13px;background:rgba(255,255,255,.13);
+ border:1px solid rgba(255,255,255,.13);color:#f8f8fa;font-size:13px;
+ font-weight:700;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+header nav button.active{background:#fff;color:#243746;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+#countView{display:flex;flex-direction:column}
+#countView>.progress{order:1}
+#catalogList{order:2}
+#finishCountBtn{order:3}
+#countView>.hint{order:4}
+#keypadPanel{order:5}
+#countView>.top{display:none!important}
+#headerTools .top{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;
+ gap:8px;align-items:center;margin:0;padding:8px 10px;
+ width:100%;min-height:0;border-radius:15px;
+ background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);
+ box-shadow:none;color:#fff;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+#headerTools .top>div{display:flex;align-items:center;gap:7px;min-width:0}
+#headerTools .top .muted{color:rgba(255,255,255,.75)!important;font-size:9px!important;font-weight:800;letter-spacing:.08em}
+#headerTools input[type=date]{
+ min-width:0;width:132px;max-width:132px;height:34px;padding:5px 7px;
+ border:1px solid rgba(255,255,255,.22);border-radius:9px;
+ background:rgba(255,255,255,.95);color:#243746;font-size:12px;font-weight:700;
+}
+#headerTools #progressText{font-size:11px;color:#fff;white-space:nowrap}
+#headerTools .download-btn{
+ padding:9px 10px;border-radius:10px;background:#fff;color:#243746;
+ font-size:11px;font-weight:800;box-shadow:none;
+}
+main{max-width:760px;padding:16px 14px 44px}
+#accountBar,.top,.panel,.cat,.keypad-panel{
+ border:1px solid rgba(60,60,67,.10);border-radius:17px;
+ background:rgba(255,255,255,.88);box-shadow:0 5px 20px rgba(28,42,54,.045);
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+#accountBar{padding:11px 13px}
+.cat{border-radius:17px;padding:10px;margin-bottom:12px}
+.cat h2{border-radius:10px;background:#f4eee7;color:#33495a}
+.flavor{min-height:56px}
+.amount{border-radius:12px;min-height:43px}
+.finish-count-btn{border-radius:15px;margin-top:18px;padding:16px}
+.panel{border-radius:17px}
+@media(max-width:520px){
+ header{padding-left:12px;padding-right:12px}
+ .header-main{gap:8px;min-height:56px}
+ .brand-icon{width:50px;height:50px;border-radius:14px}
+ #headerTools .top{grid-template-columns:minmax(0,1fr) auto;gap:6px;padding:6px 7px}
+ #headerTools .top>div{gap:5px}
+ #headerTools .top .muted{display:none}
+ #headerTools input[type=date]{width:116px;max-width:116px;height:32px;font-size:11px}
+ #headerTools #progressText{display:none}
+ #headerTools .download-btn{font-size:10px;padding:8px 9px}
+ header nav button{font-size:12px;padding:10px 4px;min-height:39px}
+ main{padding:13px 10px 38px}
+}
+@media(prefers-reduced-motion:no-preference){
+ button,.cat,.panel{transition:transform .16s ease,box-shadow .16s ease}
+ button:active{transform:scale(.985)}
+}
+@media print{
+ header{display:none!important}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -161,14 +254,14 @@ input[type=date]{padding:6px 8px;font-size:12px;max-width:145px;height:34px}
  </div>
 </section>
 <div id="appShell" class="hidden">
-<header><h1>CONTROL DE LATAS</h1><nav>
+<header><div class="header-main"><img class="brand-icon" src="icon-192.png" alt="Logo de CONTROL DE LATAS"><div class="header-tools" id="headerTools"></div></div><nav>
 <button class="active" data-view="count">Conteo</button><button data-view="history">Historial</button><button data-view="flavors">Sabores</button>
 </nav></header>
 <main>
 <div id="accountBar"><span><strong id="accountEmail"></strong><br><span id="roleLabel"></span><br><span id="syncState">Conectando…</span></span><div id="accountActions"><button id="refreshBtn" type="button" title="Actualizar datos">↻ Actualizar</button><button id="signOutBtn">Salir</button></div></div>
 <section id="countView">
 <div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
-<div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">Descargar PDF</button></div>
+<div class="top" id="countToolbar"><div><div class="muted">FECHA</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">↓ PDF</button></div>
 <div class="progress"><i id="progressBar" style="width:0%"></i></div>
 <div id="catalogList"></div>
 <button id="finishCountBtn" class="finish-count-btn" type="button">✓ Finalizar conteo y limpiar cantidades</button>
@@ -266,6 +359,12 @@ document.querySelector("#signInBtn").addEventListener("click",()=>authAction("si
 document.querySelector("#signUpBtn").addEventListener("click",()=>authAction("signup"));document.querySelector("#signOutBtn").onclick=async()=>{cloudReady=false;currentRole=null;clearTimeout(saveTimer);if(realtimeChannel)await supabase.removeChannel(realtimeChannel);await supabase.auth.signOut();showAuth("Sesión cerrada.")};
 (async()=>{const {data}=await supabase.auth.getSession();if(data.session?.user && showApp(data.session.user)){try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}else showAuth()})();
 supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")showAuth()});
+
+// La barra de fecha y PDF se muestra en el espacio superior del encabezado.
+const countToolbar=document.querySelector("#countToolbar");
+const headerTools=document.querySelector("#headerTools");
+if(countToolbar && headerTools) headerTools.appendChild(countToolbar);
+
 const dateEl=document.querySelector("#date");dateEl.value=localDate(); if(!dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
 function localDate(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function entries(){return catalog.flatMap(c=>c.items.map(f=>({...f,category:c.name})))}
