@@ -35,6 +35,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 .keys{display:grid;grid-template-columns:1fr 1fr;gap:10px}.keys button{height:76px;border-radius:18px;background:#edf0eb;color:var(--ink);font-size:32px;font-weight:850}
 .keys .clear{background:#f6e9e5;color:var(--red);font-size:20px}.keys .enter{background:var(--ink);color:white;font-size:22px}
 .hidden{display:none!important}.muted{color:var(--muted);font-size:13px}
+#authGate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:grid;place-items:center;padding:22px}#authCard{width:min(100%,430px);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 12px 36px #0001}#authCard h2{margin:0 0 8px;font-size:22px}#authCard p{color:var(--muted);font-size:14px;line-height:1.45}#authCard label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}#authCard input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;background:white;color:var(--ink)}#authActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}#authActions button{padding:12px 8px;border-radius:12px;font-weight:800;background:var(--ink);color:white}#authActions button.secondary{background:#e6e9e3;color:var(--ink)}#authMessage{min-height:20px;margin-top:12px;font-size:13px;color:var(--red)}#accountBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:12px}#accountBar button{padding:7px 10px;border-radius:9px;background:#e6e9e3;color:var(--ink);font-weight:700}#syncState{color:var(--muted);font-size:11px}#appShell.hidden{display:none!important}
 @media print{
  @page{size:A4;margin:14mm}
  body{background:#fff;color:#111;font-size:11pt}
@@ -51,12 +52,25 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 #printHeading{display:none}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+<section id="authGate">
+ <div id="authCard">
+  <h2>CONTROL DE LATAS</h2>
+  <p>Ingresá con la cuenta compartida para ver y actualizar el mismo inventario desde los dos dispositivos.</p>
+  <label for="authEmail">Correo electrónico</label><input id="authEmail" type="email" autocomplete="email" placeholder="tu correo" required>
+  <label for="authPassword">Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Contraseña" required>
+  <div id="authActions"><button id="signInBtn">Iniciar sesión</button><button class="secondary" id="signUpBtn">Crear cuenta</button></div>
+  <div id="authMessage" role="status"></div>
+ </div>
+</section>
+<div id="appShell" class="hidden">
 <header><h1>CONTROL DE LATAS</h1><nav>
 <button class="active" data-view="count">Conteo</button><button data-view="history">Historial</button><button data-view="flavors">Sabores</button>
 </nav></header>
 <main>
+<div id="accountBar"><span><strong id="accountEmail"></strong><br><span id="syncState">Conectando…</span></span><button id="signOutBtn">Salir</button></div>
 <section id="countView">
 <div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
 <div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">Descargar PDF</button></div>
@@ -78,12 +92,25 @@ const original=[
 ["CREMAS",["Americana","Vainilla","Pistacho","Frutos de bosque","Banana split","Crema frantina","Oreo","Tramontana","Granizado","Menta granizada","Maracuya","Sambayon","Cereza","Mascarpone","Frutilla crema","Café con chocolate","Mousse de limón","Cielo","Flan","Serenito","Bananita dolca","Maicena","Marquisse"]],
 ["AL AGUA",["Limón","Frutilla","Ananá","Limón Patagonico","Naranja mango"]]
 ];
+const SUPABASE_URL="https://oqhqeewnkfqynmkpmwyq.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_tftZTAUdm4giuWfzNSgjNA_UrVPiDdW";
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const clone=x=>JSON.parse(JSON.stringify(x)), keyCat="control_latas_catalog_v3",keyCounts="control_latas_history_v3";
 let catalog=read(keyCat,original.map(([name,items])=>({id:uid(),name,items:items.map(label=>({id:uid(),label}))})));
-let history=read(keyCounts,{}), selected=null;
+let history=read(keyCounts,{}), selected=null, cloudReady=false, saveTimer=null, applyingRemote=false, realtimeChannel=null;
 function uid(){return "x"+Math.random().toString(36).slice(2,10)}
 function read(k,f){try{let x=JSON.parse(localStorage.getItem(k));return x??clone(f)}catch{return clone(f)}}
-function save(){localStorage.setItem(keyCat,JSON.stringify(catalog));localStorage.setItem(keyCounts,JSON.stringify(history))}
+function setSyncState(message){const el=document.querySelector("#syncState");if(el)el.textContent=message}
+function save(){localStorage.setItem(keyCat,JSON.stringify(catalog));localStorage.setItem(keyCounts,JSON.stringify(history));if(cloudReady&&!applyingRemote){setSyncState("Guardando cambios…");clearTimeout(saveTimer);saveTimer=setTimeout(pushCloud,350)}}
+async function pushCloud(){if(!cloudReady)return;const payload={id:1,catalog,history,updated_at:new Date().toISOString()};const {error}=await supabase.from("control_latas_data").upsert(payload,{onConflict:"id"});if(error){setSyncState("Error al sincronizar: "+error.message);console.error(error)}else setSyncState("Sincronizado")}
+function applyCloudRow(row){applyingRemote=true;catalog=Array.isArray(row.catalog)&&row.catalog.length?row.catalog:catalog;history=row.history&&typeof row.history==="object"?row.history:history;localStorage.setItem(keyCat,JSON.stringify(catalog));localStorage.setItem(keyCounts,JSON.stringify(history));applyingRemote=false;renderCount();if(!document.querySelector("#historyView").classList.contains("hidden"))renderHistory();if(!document.querySelector("#flavorsView").classList.contains("hidden"))renderEdit();setSyncState("Sincronizado")}
+async function initializeCloud(){setSyncState("Cargando inventario compartido…");const {data:row,error}=await supabase.from("control_latas_data").select("id,catalog,history,updated_at").eq("id",1).maybeSingle();if(error){setSyncState("Error de lectura: "+error.message);throw error}if(row){applyCloudRow(row)}else{const {error:insertError}=await supabase.from("control_latas_data").insert({id:1,catalog,history});if(insertError)throw insertError;setSyncState("Inventario inicial guardado")};cloudReady=true;if(realtimeChannel)await supabase.removeChannel(realtimeChannel);realtimeChannel=supabase.channel("control-latas-live").on("postgres_changes",{event:"UPDATE",schema:"public",table:"control_latas_data",filter:"id=eq.1"},payload=>{if(payload.new&&cloudReady){clearTimeout(saveTimer);applyCloudRow(payload.new)}}).subscribe();setSyncState("Sincronizado")}
+function showApp(user){document.querySelector("#authGate").classList.add("hidden");document.querySelector("#appShell").classList.remove("hidden");document.querySelector("#accountEmail").textContent=user.email||"Cuenta compartida"}
+function showAuth(message=""){document.querySelector("#appShell").classList.add("hidden");document.querySelector("#authGate").classList.remove("hidden");document.querySelector("#authMessage").textContent=message}
+async function authAction(mode){const email=document.querySelector("#authEmail").value.trim(),password=document.querySelector("#authPassword").value;const msg=document.querySelector("#authMessage");if(!email||!password){msg.textContent="Ingresá tu correo y contraseña.";return}if(password.length<6){msg.textContent="La contraseña debe tener al menos 6 caracteres.";return}msg.textContent=mode==="signup"?"Creando cuenta…":"Ingresando…";const result=mode==="signup"?await supabase.auth.signUp({email,password}):await supabase.auth.signInWithPassword({email,password});if(result.error){msg.textContent=result.error.message;return}if(mode==="signup"&&!result.data.session){msg.textContent="Cuenta creada. Revisá tu correo y confirmá el registro; después volvé e iniciá sesión.";return}if(result.data.user){showApp(result.data.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}}
+document.querySelector("#signInBtn").onclick=()=>authAction("signin");document.querySelector("#signUpBtn").onclick=()=>authAction("signup");document.querySelector("#signOutBtn").onclick=async()=>{cloudReady=false;clearTimeout(saveTimer);if(realtimeChannel)await supabase.removeChannel(realtimeChannel);await supabase.auth.signOut();showAuth("Sesión cerrada.")};
+(async()=>{const {data}=await supabase.auth.getSession();if(data.session?.user){showApp(data.session.user);try{await initializeCloud()}catch(e){cloudReady=false;setSyncState("No se pudo cargar: "+e.message);alert("No se pudo conectar con el inventario: "+e.message)}}else showAuth()})();
+supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")showAuth()});
 const dateEl=document.querySelector("#date");dateEl.value=localDate(); if(!dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
 function localDate(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function entries(){return catalog.flatMap(c=>c.items.map(f=>({...f,category:c.name})))}
@@ -182,7 +209,7 @@ document.querySelector("#downloadPdf").addEventListener("click",async()=>{
    if(await ensurePdfLibrary()){
      const {jsPDF}=window.jspdf;
      const doc=new jsPDF({unit:"mm",format:"a4"});
-     const left=32,right=178;let y=18;
+     const left=15,right=195;let y=18;
      doc.setFont("helvetica","bold");doc.setFontSize(18);doc.text("CONTROL DE LATAS",left,y);y+=8;
      doc.setFont("helvetica","normal");doc.setFontSize(10);doc.text("Fecha: "+dateText,left,y);y+=7;
      doc.setFont("helvetica","bold");doc.text("SABOR",left,y);doc.text("CANTIDAD",right,y,{align:"right"});y+=3;
@@ -225,4 +252,5 @@ document.addEventListener("gestureend",e=>e.preventDefault(),{passive:false});
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 renderCount();
-</script></body></html>
+</script>
+</div></body></html>
