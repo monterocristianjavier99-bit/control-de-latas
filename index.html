@@ -117,6 +117,34 @@ input[type=date]{border-color:var(--line);font-weight:700}
 @media(max-width:420px){main{padding-left:11px;padding-right:11px}.top{flex-wrap:wrap}.top>strong{margin-left:auto}.download-btn{padding:10px 11px;font-size:12px}.report-sheet{padding:16px}.report-toolbar .download-btn{font-size:11px}.history-row{align-items:flex-start}}
 @media print{body{background:#fff!important}header,.report-toolbar,#accountBar{display:none!important}main{max-width:none;padding:0}#countView,#historyView,#flavorsView{display:none!important}#completedReportView{display:block!important}#completedReport{border:0;box-shadow:none;border-radius:0;padding:0}.report-category{break-inside:avoid}}
 
+
+/* Barra superior compacta para fecha y PDF */
+.top{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto auto;
+ align-items:center;
+ gap:10px;
+ padding:8px 11px;
+ min-height:58px;
+ margin-bottom:10px;
+ border-radius:14px;
+ box-shadow:none;
+}
+.top>div{display:flex;align-items:center;gap:8px;min-width:0}
+.top .muted{margin:0!important;font-size:9px!important;white-space:nowrap;letter-spacing:.08em}
+input[type=date]{padding:6px 8px;font-size:12px;max-width:145px;height:34px}
+#progressText{font-size:12px;white-space:nowrap}
+.top .download-btn{padding:8px 10px;font-size:11px;border-radius:10px;box-shadow:none}
+.progress{margin-bottom:14px}
+@media(max-width:420px){
+ .top{grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:7px 9px;min-height:52px}
+ .top>div{gap:5px}
+ .top .muted{font-size:8px!important}
+ input[type=date]{max-width:126px;height:32px;padding:5px;font-size:11px}
+ #progressText{display:none}
+ .top .download-btn{font-size:10px;padding:8px}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -142,8 +170,8 @@ input[type=date]{border-color:var(--line);font-weight:700}
 <div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
 <div class="top"><div><div class="muted">FECHA DEL CONTEO</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">Descargar PDF</button></div>
 <div class="progress"><i id="progressBar" style="width:0%"></i></div>
-<button id="finishCountBtn" class="finish-count-btn" type="button">✓ Finalizar conteo y limpiar cantidades</button>
 <div id="catalogList"></div>
+<button id="finishCountBtn" class="finish-count-btn" type="button">✓ Finalizar conteo y limpiar cantidades</button>
 <p class="hint">Tocá el espacio de cada sabor para abrir el teclado de cantidades.</p>
 <div class="keypad-panel" id="keypadPanel"><div class="keypad">
 <div class="keyhead"><div><div class="muted">EDITANDO SABOR</div><strong id="selectedName">Sabor</strong></div><button class="close" id="closeKey" aria-label="Cerrar">×</button></div>
