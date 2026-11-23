@@ -280,6 +280,88 @@ main{max-width:760px;padding:16px 14px 44px}
 .save-flavors-btn:disabled{opacity:.65;cursor:wait}
 .save-flavors-note{margin:9px 2px 0;color:var(--muted);font-size:11px;line-height:1.4;text-align:center}
 
+
+/* Selector de apariencia debajo del logo */
+.brand-stack{display:flex;flex-direction:column;align-items:center;gap:7px;flex:0 0 auto}
+.theme-toggle{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);color:#fff;font-size:11px;font-weight:800;white-space:nowrap}
+.theme-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-width:520px){.brand-stack{gap:5px}.theme-toggle{font-size:10px;padding:6px 8px}}
+/* Modo noche: se conserva el encabezado y se oscurece el contenido */
+body.dark-mode{
+ --paper:#111820;--card:#1d2832;--line:#354451;--muted:#aab5bd;--soft:#2a3945;
+ background:linear-gradient(180deg,#18232d 0,#111820 300px,#111820 100%);color:#edf2f5
+}
+body.dark-mode main{color:#edf2f5}
+body.dark-mode #accountBar,body.dark-mode .top,body.dark-mode .panel,
+body.dark-mode .cat,body.dark-mode .keypad-panel{
+ background:rgba(29,40,50,.97)!important;border-color:#354451!important;color:#edf2f5!important;
+ box-shadow:0 5px 20px rgba(0,0,0,.18)!important
+}
+body.dark-mode .cat h2{background:#293945!important;color:#f0f4f6!important;border-color:#40515e!important}
+body.dark-mode .flavor{border-bottom-color:#354451}
+body.dark-mode .name,body.dark-mode .panel h2,body.dark-mode .keyhead strong,
+body.dark-mode .history-row,body.dark-mode .editrow{color:#edf2f5}
+body.dark-mode .amount,body.dark-mode input,body.dark-mode .editrow input{
+ background:#263541!important;color:#f4f7f9!important;border-color:#465866!important
+}
+body.dark-mode .smallbtn,body.dark-mode .close,body.dark-mode .keys button{
+ background:#344653!important;color:#f4f7f9!important
+}
+body.dark-mode .keys .clear{background:#543b3a!important;color:#ffd8d3!important}
+body.dark-mode .keys .enter{background:#d18a78!important;color:#18232d!important}
+body.dark-mode .progress{background:#354451}
+body.dark-mode .progress i{background:linear-gradient(90deg,#6f9bb2,#d18a78)}
+body.dark-mode #authGate{background:#111820!important}
+body.dark-mode #authCard{background:#1d2832!important;border-color:#354451!important;color:#edf2f5}
+body.dark-mode #authCard input{background:#263541!important;color:#fff!important;border-color:#465866!important}
+body.dark-mode #authCard p,body.dark-mode #authCard label{color:#c2cbd1}
+body.dark-mode .history-row{border-bottom-color:#354451}
+body.dark-mode .save-flavors-note{color:#aab5bd}
+
+
+
+/* --- Navegación y desplazamiento fluido estilo iPhone / WhatsApp --- */
+html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+body{min-height:100svh;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+header{
+ position:sticky;top:0;z-index:1000;
+ padding-top:calc(env(safe-area-inset-top) + 9px);
+ border-radius:0 0 21px 21px;
+ transition:box-shadow .22s ease,background .22s ease;
+}
+.header-main{margin-bottom:9px;min-height:54px}
+.brand-stack{gap:6px}
+.brand-icon{width:48px;height:48px;border-radius:13px}
+.theme-toggle{font-size:10px;padding:6px 9px;min-height:29px}
+header nav{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+header nav button{min-height:39px;padding:9px 5px;font-size:12px;border-radius:12px}
+main{padding-top:14px;padding-bottom:calc(34px + env(safe-area-inset-bottom));}
+#accountBar{scroll-margin-top:160px}
+.cat,.panel,.report-sheet{scroll-margin-top:155px}
+.cat{margin-bottom:11px}
+.cat h2{position:sticky;top:calc(env(safe-area-inset-top) + 116px);z-index:3;box-shadow:0 2px 8px rgba(30,45,55,.045)}
+.flavor{min-height:57px;padding-top:7px;padding-bottom:7px}
+.amount{min-width:70px;min-height:44px}
+#keypadPanel{scroll-margin-top:160px}
+#historyList .history-row:last-child{border-bottom:0}
+button{touch-action:manipulation; -webkit-user-select:none;user-select:none}
+@media(max-width:520px){
+ header{padding-left:11px;padding-right:11px;border-radius:0 0 19px 19px}
+ .header-main{min-height:52px;gap:8px}
+ .brand-icon{width:45px;height:45px}
+ .theme-toggle{font-size:9px;padding:5px 7px}
+ header nav button{min-height:38px;font-size:11px}
+ main{padding:11px 10px calc(30px + env(safe-area-inset-bottom))}
+ .cat{padding:8px;border-radius:15px}
+ .cat h2{top:calc(env(safe-area-inset-top) + 108px);padding:10px 12px}
+ .flavor{grid-template-columns:minmax(0,1fr) 76px;gap:8px;min-height:54px}
+ .name{font-size:14px}
+ .amount{min-height:42px;font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+body.dark-mode header{box-shadow:0 8px 24px rgba(0,0,0,.28)}
+body.dark-mode .cat h2{box-shadow:0 2px 8px rgba(0,0,0,.2)}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -296,7 +378,7 @@ main{max-width:760px;padding:16px 14px 44px}
  </div>
 </section>
 <div id="appShell" class="hidden">
-<header><div class="header-main"><img class="brand-icon" src="icon-192.png" alt="Logo de CONTROL DE LATAS"><div class="header-tools" id="headerTools"></div></div><nav>
+<header><div class="header-main"><div class="brand-stack"><img class="brand-icon" src="icon-192.png" alt="Logo de CONTROL DE LATAS"><button id="themeToggle" class="theme-toggle" type="button" aria-label="Activar modo noche">☾ Modo noche</button></div><div class="header-tools" id="headerTools"></div></div><nav>
 <button class="active" data-view="count">Conteo</button><button data-view="history">Historial</button><button data-view="flavors">Sabores</button>
 </nav></header>
 <main>
@@ -469,7 +551,7 @@ document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[sel
 document.querySelector("#enterValue").onclick=enterNext;
 document.querySelector("#closeKey").onclick=closeKey;
 dateEl.onchange=()=>{selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="flavors"&&!canEditCatalog())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors","completedReport"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit()});
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="flavors"&&!canEditCatalog())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors","completedReport"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit();requestAnimationFrame(()=>window.scrollTo({top:0,behavior:"smooth"}))});
 function renderHistory(){
  const dates=Object.keys(history).filter(d=>!d.startsWith("_")&&Object.keys(history[d]||{}).length).sort().reverse();
  const completed=Array.isArray(history._completed)?history._completed:[];
@@ -696,6 +778,28 @@ document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});
 document.addEventListener("gesturechange",e=>e.preventDefault(),{passive:false});
 document.addEventListener("gestureend",e=>e.preventDefault(),{passive:false});
+
+
+// Alternar modo día/noche y recordar la elección en este dispositivo.
+const themeToggle = document.getElementById("themeToggle");
+function applyTheme(mode){
+  const night = mode === "night";
+  document.body.classList.toggle("dark-mode", night);
+  if(themeToggle){
+    themeToggle.textContent = night ? "☀ Modo día" : "☾ Modo noche";
+    themeToggle.setAttribute("aria-label", night ? "Activar modo día" : "Activar modo noche");
+  }
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if(themeMeta) themeMeta.setAttribute("content", night ? "#111820" : "#34495e");
+}
+let savedTheme = "day";
+try{ savedTheme = localStorage.getItem("control_latas_theme") || "day"; }catch(e){}
+applyTheme(savedTheme);
+themeToggle?.addEventListener("click",()=>{
+  const next = document.body.classList.contains("dark-mode") ? "day" : "night";
+  applyTheme(next);
+  try{ localStorage.setItem("control_latas_theme",next); }catch(e){}
+});
 
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 renderCount();
