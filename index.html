@@ -473,19 +473,20 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.v
 function renderHistory(){
  const dates=Object.keys(history).filter(d=>!d.startsWith("_")&&Object.keys(history[d]||{}).length).sort().reverse();
  const completed=Array.isArray(history._completed)?history._completed:[];
- const regularHtml=dates.map(d=>`<div class="history-row"><div><strong>${new Date(d+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}</strong><div class="muted">${Object.keys(history[d]).length} sabores cargados · Conteo activo</div></div><div><button class="smallbtn" data-open="${d}">Ver / editar</button> <button class="smallbtn" data-del="${d}">×</button></div></div>`).join("");
- const completedHtml=completed.slice().reverse().map((r,i)=>`<div class="history-row"><div><strong>${new Date(r.date+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})} · Finalizado</strong><div class="muted">${Object.keys(r.values||{}).length} sabores · Total: ${fmt(r.total||0)}</div></div><div><button class="smallbtn" data-show-completed="${completed.length-1-i}">Ver registro</button> <button class="smallbtn" data-del-completed="${completed.length-1-i}">×</button></div></div>`).join("");
+ const regularHtml=dates.map(d=>`<div class="history-row"><div><strong>${new Date(d+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})}</strong><div class="muted">${Object.keys(history[d]).length} sabores cargados · Conteo activo</div></div><div><button class="smallbtn" data-open="${d}">Ver / editar</button> ${canEditCatalog()?`<button class="smallbtn" data-del="${d}">×</button>`:""}</div></div>`).join("");
+ const completedHtml=completed.slice().reverse().map((r,i)=>`<div class="history-row"><div><strong>${new Date(r.date+"T12:00").toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"})} · Finalizado</strong><div class="muted">${Object.keys(r.values||{}).length} sabores · Total: ${fmt(r.total||0)}</div></div><div><button class="smallbtn" data-show-completed="${completed.length-1-i}">Ver registro</button> ${canEditCatalog()?`<button class="smallbtn" data-del-completed="${completed.length-1-i}">×</button>`:""}</div></div>`).join("");
  document.querySelector("#historyList").innerHTML=(completedHtml+regularHtml)||'<p class="muted">Todavía no hay conteos guardados.</p>';
  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{dateEl.value=b.dataset.open;document.querySelector('[data-view="count"]').click();renderCount()});
- document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este conteo activo?")){delete history[b.dataset.del];save();renderHistory()}});
+ document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(!canEditCatalog())return;if(confirm("¿Borrar este conteo activo?")){delete history[b.dataset.del];save();renderHistory()}});
  document.querySelectorAll("[data-show-completed]").forEach(b=>b.onclick=()=>openCompletedReport(+b.dataset.showCompleted));
- document.querySelectorAll("[data-del-completed]").forEach(b=>b.onclick=()=>{if(confirm("¿Borrar este registro del historial?")){history._completed.splice(+b.dataset.delCompleted,1);save();renderHistory()}});
+ document.querySelectorAll("[data-del-completed]").forEach(b=>b.onclick=()=>{if(!canEditCatalog())return;if(confirm("¿Borrar este registro del historial?")){history._completed.splice(+b.dataset.delCompleted,1);save();renderHistory()}});
 }
 
 function openCompletedReport(index){
  const records=Array.isArray(history._completed)?history._completed:[];
  const record=records[index];
  if(!record)return;
+ window.currentCompletedReportIndex=index;
  const dateText=new Date(record.date+"T12:00:00").toLocaleDateString("es-AR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
  const savedValues=record.values||{};
  const reportCatalog=Array.isArray(record.catalog)?record.catalog:catalog;
@@ -515,7 +516,61 @@ document.querySelector("#backToHistory").onclick=()=>{
  renderHistory();
  window.scrollTo({top:0,behavior:"smooth"});
 };
-document.querySelector("#printCompletedReport").onclick=()=>window.print();
+document.querySelector("#printCompletedReport").onclick=async()=>{
+ const button=document.querySelector("#printCompletedReport");
+ const oldLabel=button.textContent;
+ const records=Array.isArray(history._completed)?history._completed:[];
+ // El registro que está abierto se identifica por el índice guardado al mostrarlo.
+ const record=records[window.currentCompletedReportIndex];
+ if(!record){alert("No se encontró el registro para generar el PDF.");return;}
+ button.disabled=true;button.textContent="Preparando PDF…";
+ try{
+   if(await ensurePdfLibrary()){
+     const {jsPDF}=window.jspdf;
+     const doc=new jsPDF({unit:"mm",format:"a4"});
+     const left=15,right=195;let y=18;
+     const reportDate=new Date(record.date+"T12:00:00").toLocaleDateString("es-AR");
+     const values=record.values||{};
+     const reportCatalog=Array.isArray(record.catalog)?record.catalog:catalog;
+     const total=record.total??Object.values(values).reduce((sum,value)=>sum+(Number(value)||0),0);
+     doc.setFont("helvetica","bold");doc.setFontSize(18);doc.text("CONTROL DE LATAS",left,y);y+=8;
+     doc.setFont("helvetica","normal");doc.setFontSize(10);
+     doc.text("Registro de conteo finalizado",left,y);y+=6;
+     doc.text("Fecha: "+reportDate,left,y);y+=8;
+     doc.setFont("helvetica","bold");doc.text("SABOR",left,y);doc.text("CANTIDAD",right,y,{align:"right"});y+=3;
+     doc.setDrawColor(190);doc.line(left,y,right,y);y+=6;
+     for(const category of reportCatalog){
+       const rows=(category.items||[]).filter(flavor=>values[flavor.id]!==undefined);
+       if(!rows.length)continue;
+       if(y>270){doc.addPage();y=18;}
+       doc.setFont("helvetica","bold");doc.setFontSize(11);
+       doc.text(String(category.name).toUpperCase(),left,y);y+=6;
+       doc.setFont("helvetica","normal");doc.setFontSize(10);
+       for(const flavor of rows){
+         if(y>280){doc.addPage();y=18;}
+         doc.text(String(flavor.label),left+2,y);
+         doc.text(fmt(values[flavor.id]),right,y,{align:"right"});
+         doc.setDrawColor(230);doc.line(left+2,y+2,right,y+2);y+=6;
+       }
+       y+=2;
+     }
+     if(y>280){doc.addPage();y=18;}
+     doc.setFont("helvetica","bold");doc.setFontSize(12);
+     doc.text("TOTAL GENERAL: "+fmt(total),left,y+3);
+     doc.save("Control-de-latas-"+record.date+".pdf");
+   }else{
+     button.textContent=oldLabel;button.disabled=false;
+     setTimeout(()=>window.print(),120);
+     return;
+   }
+ }catch(error){
+   console.error("Error al generar PDF del historial:",error);
+   button.textContent=oldLabel;button.disabled=false;
+   setTimeout(()=>window.print(),120);
+   return;
+ }
+ button.textContent=oldLabel;button.disabled=false;
+};
 
 document.querySelector("#finishCountBtn").addEventListener("click",async()=>{
  const values=clone(day());
