@@ -40,7 +40,7 @@ input[type=date]{font:inherit;padding:9px;border:1px solid var(--line);border-ra
 .keypad-panel.show{display:block}.keypad{width:100%}
 .keyhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.keyhead strong{font-size:18px}.close{background:#e8ece7;border-radius:50%;width:38px;height:38px;font-size:22px}
 .keys{display:grid;grid-template-columns:1fr 1fr;gap:10px}.keys button{height:76px;border-radius:18px;background:#edf0eb;color:var(--ink);font-size:32px;font-weight:850}
-.keys .clear{background:#f6e9e5;color:var(--red);font-size:20px}.keys .enter{background:var(--ink);color:white;font-size:22px}
+.keys .clear{background:#f6e9e5;color:var(--red);font-size:20px}.keys .enter{background:var(--ink);color:white;font-size:22px}.keys .undo{background:#e8edf5;color:#344b5b;font-size:17px;font-weight:850}.keys .enter{grid-column:1 / -1;height:62px}
 .hidden{display:none!important}.muted{color:var(--muted);font-size:13px}
 #authGate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:grid;place-items:center;padding:22px}#authCard{width:min(100%,430px);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 12px 36px #0001}#authCard h2{margin:0 0 8px;font-size:22px}#authCard p{color:var(--muted);font-size:14px;line-height:1.45}#authCard label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}#authCard input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;background:white;color:var(--ink)}#authActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}#authActions button{padding:12px 8px;border-radius:12px;font-weight:800;background:var(--ink);color:white}#authActions button.secondary{background:#e6e9e3;color:var(--ink)}#authMessage{min-height:20px;margin-top:12px;font-size:13px;color:var(--red)}#accountBar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:12px}#accountActions{display:flex;align-items:center;gap:7px;flex-shrink:0}#accountBar button{padding:7px 10px;border-radius:9px;background:#e6e9e3;color:var(--ink);font-weight:700}#accountBar #refreshBtn{background:var(--ink);color:#fff}#accountBar #refreshBtn:disabled{opacity:.6;cursor:wait}#syncState{color:var(--muted);font-size:11px}#roleLabel{display:inline-block;margin-top:3px;font-size:11px;font-weight:800;color:var(--ink);background:#e9eee9;border-radius:7px;padding:2px 7px}#appShell.hidden{display:none!important}
 @media print{
@@ -122,7 +122,7 @@ input[type=date]{border-color:var(--line);font-weight:700}
 /* Barra superior compacta para fecha y PDF */
 .top{
  display:grid;
- grid-template-columns:minmax(0,1fr) auto auto;
+ grid-template-columns:minmax(0,1fr);
  align-items:center;
  gap:10px;
  padding:8px 11px;
@@ -187,7 +187,7 @@ header nav button.active{background:#fff;color:#243746;box-shadow:0 2px 8px rgba
 #keypadPanel{order:5}
 #countView>.top{display:none!important}
 #headerTools .top{
- display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;
+ display:grid!important;grid-template-columns:minmax(0,1fr);
  gap:8px;align-items:center;margin:0;padding:8px 10px;
  width:100%;min-height:0;border-radius:15px;
  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);
@@ -200,7 +200,6 @@ header nav button.active{background:#fff;color:#243746;box-shadow:0 2px 8px rgba
  border:1px solid rgba(255,255,255,.22);border-radius:9px;
  background:rgba(255,255,255,.95);color:#243746;font-size:12px;font-weight:700;
 }
-#headerTools #progressText{font-size:11px;color:#fff;white-space:nowrap}
 #headerTools .download-btn{
  padding:9px 10px;border-radius:10px;background:#fff;color:#243746;
  font-size:11px;font-weight:800;box-shadow:none;
@@ -226,7 +225,6 @@ main{max-width:760px;padding:16px 14px 44px}
  #headerTools .top>div{gap:5px}
  #headerTools .top .muted{display:none}
  #headerTools input[type=date]{width:116px;max-width:116px;height:32px;font-size:11px}
- #headerTools #progressText{display:none}
  #headerTools .download-btn{font-size:10px;padding:8px 9px}
  header nav button{font-size:12px;padding:10px 4px;min-height:39px}
  main{padding:13px 10px 38px}
@@ -1146,14 +1144,14 @@ body.dark-mode .keys .enter{background:#d18a78!important;color:#17232c!important
 <div id="accountBar"><span><strong id="accountEmail"></strong><br><span id="roleLabel"></span><br><span id="syncState">Conectando…</span></span><div id="accountActions"><button id="refreshBtn" type="button" title="Actualizar datos">↻ Actualizar</button><button id="signOutBtn">Salir</button></div></div>
 <section id="countView">
 <div id="printHeading"><h1>CONTROL DE LATAS</h1><div id="printDate"></div><div id="printTotal"></div></div>
-<div class="top" id="countToolbar"><div><div class="muted">FECHA</div><input id="date" type="date"></div><strong id="progressText">0 / 41</strong><button class="download-btn" id="downloadPdf">↓ PDF</button></div>
-<div class="progress"><i id="progressBar" style="width:0%"></i></div>
+<div class="top" id="countToolbar"><div><div class="muted">FECHA</div><input id="date" type="date"></div></div>
+
 <div id="catalogList"></div>
 <button id="finishCountBtn" class="finish-count-btn" type="button">✓ Finalizar conteo y limpiar cantidades</button>
 <p class="hint">Tocá el espacio de cada sabor para abrir el teclado de cantidades.</p>
 <div class="keypad-panel" id="keypadPanel"><div class="keypad">
 <div class="keyhead"><div><div class="muted">EDITANDO SABOR</div><strong id="selectedName">Sabor</strong></div><button class="close" id="closeKey" aria-label="Cerrar">×</button></div>
-<div class="keys"><button data-val="1">1</button><button data-val="1.5">1,5</button><button data-val="0">0</button><button data-val="0.5">0,5</button><button class="clear" id="clearValue">BORRAR</button><button class="enter" id="enterValue">ENTER ↵</button></div>
+<div class="keys"><button data-val="1">1</button><button data-val="1.5">1,5</button><button data-val="0">0</button><button data-val="0.5">0,5</button><button class="undo" id="undoValue" type="button">↶ DESHACER</button><button class="clear" id="clearValue">BORRAR</button><button class="enter" id="enterValue">ENTER ↵</button></div>
 </div></div>
 </section>
 <section id="historyView" class="hidden"><div class="panel"><h2>Historial de conteos</h2><div id="historyList"></div></div></section>
@@ -1255,6 +1253,9 @@ if(accountBar && headerTools) headerTools.appendChild(accountBar);
 const accountEmail=document.querySelector("#accountEmail");
 if(accountEmail) accountEmail.textContent="";
 
+const undoStack=[];
+function rememberUndo(){if(!selected)return;const d=dateEl.value;const current=history[d]||{};undoStack.push({date:d,id:selected,had:Object.prototype.hasOwnProperty.call(current,selected),value:current[selected]});if(undoStack.length>100)undoStack.shift();}
+function undoLast(){const previous=undoStack.pop();if(!previous){return;}if(previous.had){(history[previous.date]||(history[previous.date]={}))[previous.id]=previous.value;}else if(history[previous.date]){delete history[previous.date][previous.id];}save();if(previous.date===dateEl.value){selected=previous.id;const f=entries().find(x=>x.id===selected);document.querySelector("#selectedName").textContent=f?.label||"Sabor";renderCount();const row=document.querySelector(`[data-row="${CSS.escape(selected)}"]`);const panel=document.querySelector("#keypadPanel");if(row&&panel){row.insertAdjacentElement("afterend",panel);panel.classList.add("show");}}}
 const dateEl=document.querySelector("#date");dateEl.value=localDate(); if(!dateEl.value) dateEl.value=new Date().toISOString().slice(0,10);
 function localDate(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function entries(){return catalog.flatMap(c=>c.items.map(f=>({...f,category:c.name})))}
@@ -1264,15 +1265,13 @@ function renderCount(){
 const panel=document.querySelector("#keypadPanel"),list=document.querySelector("#catalogList");
 // Move the keypad out before rebuilding the flavor list, otherwise innerHTML would destroy it.
 if(panel && list.contains(panel)) list.insertAdjacentElement("afterend",panel);
-let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;
-document.querySelector("#progressText").textContent=`${done} / ${all.length}`;
-document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";
+let values=day();
 list.innerHTML=catalog.map(c=>`<section class="cat"><h2>${esc(c.name)}</h2>${c.items.map(f=>`<div class="flavor" data-row="${f.id}"><span class="name">${esc(f.label)}</span><button class="amount ${values[f.id]===undefined?"empty":""}" data-id="${f.id}">${fmt(values[f.id])}</button></div>`).join("")}</section>`).join("");
 document.querySelectorAll(".amount").forEach(b=>b.onclick=()=>openKey(b.dataset.id));
 if(selected){const row=document.querySelector(`[data-row="${CSS.escape(selected)}"]`);if(row){row.insertAdjacentElement("afterend",panel);panel.classList.add("show");}else{panel.classList.remove("show");}}
 }
 function openKey(id){selected=id;let f=entries().find(x=>x.id===id);document.querySelector("#selectedName").textContent=f?.label||"Sabor";renderCount();}
-function updateSelectedAmount(){if(!selected)return;const value=day()[selected],button=document.querySelector(`.amount[data-id="${CSS.escape(selected)}"]`);if(button){button.textContent=fmt(value);button.classList.toggle("empty",value===undefined);}let all=entries(),values=day(),done=all.filter(f=>values[f.id]!==undefined).length;document.querySelector("#progressText").textContent=`${done} / ${all.length}`;document.querySelector("#progressBar").style.width=(all.length?done/all.length*100:0)+"%";}
+function updateSelectedAmount(){if(!selected)return;const value=day()[selected],button=document.querySelector(`.amount[data-id="${CSS.escape(selected)}"]`);if(button){button.textContent=fmt(value);button.classList.toggle("empty",value===undefined);}}
 function closeKey(){document.querySelector("#keypadPanel").classList.remove("show");selected=null;save()}
 function enterNext(){
  if(!selected){closeKey();return;}
@@ -1307,11 +1306,12 @@ function enterNext(){
    }));
  }
 }
-document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){const current=day()[selected]??0;day()[selected]=Math.round((current+Number(b.dataset.val))*10)/10;save();updateSelectedAmount();}});
-document.querySelector("#clearValue").onclick=()=>{if(selected){delete day()[selected];save();updateSelectedAmount();}};
+document.querySelectorAll("[data-val]").forEach(b=>b.onclick=()=>{if(selected){rememberUndo();const current=day()[selected]??0;day()[selected]=Math.round((current+Number(b.dataset.val))*10)/10;save();updateSelectedAmount();}});
+document.querySelector("#clearValue").onclick=()=>{if(selected && day()[selected]!==undefined){rememberUndo();delete day()[selected];save();updateSelectedAmount();}};
+document.querySelector("#undoValue").onclick=undoLast;
 document.querySelector("#enterValue").onclick=enterNext;
 document.querySelector("#closeKey").onclick=closeKey;
-dateEl.onchange=()=>{selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
+dateEl.onchange=()=>{undoStack.length=0;selected=null;document.querySelector("#keypadPanel").classList.remove("show");renderCount()};
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{if(b.dataset.view==="flavors"&&!canEditCatalog())return;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));["count","history","flavors","completedReport"].forEach(v=>document.querySelector("#"+v+"View").classList.toggle("hidden",v!==b.dataset.view));if(b.dataset.view==="history")renderHistory();if(b.dataset.view==="flavors")renderEdit();requestAnimationFrame(()=>window.scrollTo({top:0,behavior:"smooth"}))});
 function renderHistory(){
  const dates=Object.keys(history).filter(d=>!d.startsWith("_")&&Object.keys(history[d]||{}).length).sort().reverse();
@@ -1485,55 +1485,6 @@ async function ensurePdfLibrary(){
  }
  return false;
 }
-document.querySelector("#downloadPdf").addEventListener("click",async()=>{
- const button=document.querySelector("#downloadPdf");
- const oldLabel=button.textContent;
- button.textContent="Preparando PDF…";button.disabled=true;
- const values=day(), all=entries();
- const total=all.reduce((sum,f)=>sum+(Number(values[f.id])||0),0);
- const dateText=new Date(dateEl.value+"T12:00:00").toLocaleDateString("es-AR");
- document.querySelector("#printDate").textContent="Fecha: "+dateText;
- document.querySelector("#printTotal").textContent="TOTAL GENERAL: "+fmt(total);
- try{
-   // Preferir descarga directa cuando jsPDF esté disponible.
-   if(await ensurePdfLibrary()){
-     const {jsPDF}=window.jspdf;
-     const doc=new jsPDF({unit:"mm",format:"a4"});
-     const left=15,right=195;let y=18;
-     doc.setFont("helvetica","bold");doc.setFontSize(18);doc.text("CONTROL DE LATAS",left,y);y+=8;
-     doc.setFont("helvetica","normal");doc.setFontSize(10);doc.text("Fecha: "+dateText,left,y);y+=7;
-     doc.setFont("helvetica","bold");doc.text("SABOR",left,y);doc.text("CANTIDAD",right,y,{align:"right"});y+=3;
-     doc.setDrawColor(190);doc.line(left,y,right,y);y+=6;
-     for(const category of catalog){
-       if(y>275){doc.addPage();y=18;}
-       doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text(String(category.name).toUpperCase(),left,y);y+=6;
-       doc.setFont("helvetica","normal");doc.setFontSize(10);
-       for(const flavor of category.items){
-         if(y>280){doc.addPage();y=18;}
-         const amount=values[flavor.id]===undefined?"—":fmt(values[flavor.id]);
-         doc.text(String(flavor.label),left+2,y);doc.text(amount,right,y,{align:"right"});
-         doc.setDrawColor(230);doc.line(left+2,y+2,right,y+2);y+=6;
-       }
-       y+=2;
-     }
-     if(y>280){doc.addPage();y=18;}
-     doc.setFont("helvetica","bold");doc.setFontSize(12);doc.text("TOTAL GENERAL: "+fmt(total),left,y+3);
-     doc.save("Control-de-latas-"+dateEl.value+".pdf");
-   }else{
-     // Fallback compatible con Safari/iPhone: abre la hoja de impresión,
-     // desde Compartir se puede guardar el documento como PDF en Archivos.
-     button.textContent=oldLabel;button.disabled=false;
-     setTimeout(()=>window.print(),120);
-     return;
-   }
- }catch(error){
-   console.error("Error al generar PDF:",error);
-   button.textContent=oldLabel;button.disabled=false;
-   setTimeout(()=>window.print(),120);
-   return;
- }
- button.textContent=oldLabel;button.disabled=false;
-});
 // Prevent iOS Safari's double-tap and gesture zoom while preserving normal scrolling.
 document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});
