@@ -1121,6 +1121,39 @@ body.dark-mode .keys .enter{background:#d18a78!important;color:#17232c!important
   .save-flavors-note{line-height:1.5!important}
 }
 
+
+/* --- Paleta La Frantina: coral y crema --- */
+:root{
+  --ink:#FE665B; --paper:#FEFBE8; --card:#FEFBE8; --line:#f2d8ce;
+  --muted:#9b7770; --soft:#fff0e9; --red:#FE665B;
+  --accent:#FE665B; --deep:#FE665B;
+  --shadow:0 8px 26px rgba(254,102,91,.10);
+}
+body{background:var(--paper)!important;color:#5b4540!important}
+header{background:#FE665B!important;color:#FEFBE8!important;box-shadow:0 8px 24px rgba(254,102,91,.20)!important}
+nav button{background:rgba(254,251,232,.22)!important;color:#FEFBE8!important;border-color:rgba(254,251,232,.35)!important}
+nav button.active{background:#FEFBE8!important;color:#FE665B!important}
+#accountBar,.top,.panel,.cat,.keypad-panel{background:#FEFBE8!important;border-color:#f2d8ce!important}
+#accountBar button{background:#fff0e9!important;color:#b94d45!important}
+#accountBar #refreshBtn,.download-btn{background:#FE665B!important;color:#FEFBE8!important}
+input[type=date],#authCard input,.editrow input{background:#fff!important;border-color:#f2d8ce!important;color:#5b4540!important}
+.cat h2{background:#fff0e9!important;border-left-color:#FE665B!important;color:#a94b43!important}
+.flavor{border-bottom-color:#f4e7df!important}
+.name{color:#5b4540!important}
+.amount{border-color:#f2d8ce!important;color:#5b4540!important}
+.amount:not(.empty){background:#fff0e9!important;border-color:#f4b8ad!important;color:#a9433b!important}
+.finish-count-btn{background:#FE665B!important;color:#FEFBE8!important;box-shadow:0 7px 16px rgba(254,102,91,.20)!important}
+.keys button{background:#fff0e9!important;color:#a94b43!important;border-color:#f2d8ce!important}
+.keys .clear{background:#ffe2dc!important;color:#b84339!important}
+.keys .enter{background:#FE665B!important;color:#FEFBE8!important;border-color:#FE665B!important}
+.smallbtn,#accountBar button{border-color:#f2d8ce!important}
+#authCard h2{color:#FE665B!important}
+#authActions button{background:#FE665B!important;color:#FEFBE8!important}
+#authActions button.secondary{background:#fff0e9!important;color:#a94b43!important}
+body.dark-mode header{background:#FE665B!important}
+body.dark-mode .cat h2{border-left-color:#FE665B!important}
+body.dark-mode .keys .enter{background:#FE665B!important;color:#FEFBE8!important}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1517,3 +1550,26 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",
 renderCount();
 </script>
 </div></body></html>
+/* Ajuste fino del encabezado: fecha compacta y acciones separadas */
+.header-main{display:flex;align-items:center;gap:14px;}
+#headerTools{display:flex;align-items:center;justify-content:flex-start;gap:10px;flex:1;min-width:0;}
+#headerTools .top#countToolbar{display:flex!important;flex:0 0 auto;width:max-content!important;min-width:0;padding:7px 10px;margin:0;}
+#headerTools .top#countToolbar>div{display:flex;align-items:center;gap:9px;}
+#headerTools .top#countToolbar .muted{display:block!important;font-size:10px!important;white-space:nowrap;}
+#headerTools input[type=date]{width:132px;max-width:132px;}
+#headerTools #accountBar{flex:0 0 auto;margin-left:auto;gap:12px;padding:7px 10px;}
+#headerTools #accountBar>span{display:flex;flex-direction:row;align-items:center;gap:8px;white-space:nowrap;}
+#headerTools #accountBar>span br{display:none;}
+#headerTools #roleLabel{display:inline-flex;align-items:center;min-height:28px;}
+#headerTools #syncState{display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;}
+#headerTools #accountActions{display:flex;align-items:center;gap:7px;}
+#headerTools #accountBar button{min-height:34px;padding:8px 11px;font-size:11px;}
+#headerTools #accountBar #refreshBtn{background:#fff;color:#263d50;border:1px solid rgba(255,255,255,.35);}
+#headerTools #accountBar #signOutBtn{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.32);}
+@media(max-width:700px){
+ .header-main{align-items:flex-start;}
+ #headerTools{flex-direction:column;align-items:stretch;gap:7px;}
+ #headerTools .top#countToolbar{width:100%!important;}
+ #headerTools #accountBar{width:100%;margin-left:0;justify-content:space-between;}
+ #headerTools #accountBar>span{flex-direction:row;}
+}
