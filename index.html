@@ -1154,6 +1154,82 @@ body.dark-mode header{background:#FE665B!important}
 body.dark-mode .cat h2{border-left-color:#FE665B!important}
 body.dark-mode .keys .enter{background:#FE665B!important;color:#FEFBE8!important}
 
+
+/* === Encabezado compacto y paleta coral/crema === */
+:root{
+  --ink:#493b37; --paper:#FEFBE8; --card:#FEFBE8; --line:#f0d9cf;
+  --muted:#88736b; --soft:#fff0e9; --red:#FE665B; --accent:#FE665B;
+  --deep:#FE665B; --shadow:0 8px 26px rgba(115,72,58,.09);
+}
+body{background:#FEFBE8!important;color:#493b37!important}
+header{
+  background:#FE665B!important;color:#FEFBE8!important;
+  padding:10px 16px 12px!important;border-radius:0 0 20px 20px!important;
+  box-shadow:0 8px 22px rgba(254,102,91,.18)!important;
+}
+.header-main{max-width:820px!important;min-height:54px!important;margin:0 auto 9px!important;gap:14px!important;align-items:center!important}
+.brand-stack{flex:0 0 auto!important;gap:4px!important}
+.brand-icon{width:48px!important;height:48px!important;border-radius:13px!important}
+#headerTools{
+  flex:1 1 auto!important;min-width:0!important;width:auto!important;
+  display:grid!important;grid-template-columns:max-content max-content!important;
+  align-items:center!important;justify-content:end!important;gap:10px!important;
+}
+#headerTools .top#countToolbar{
+  display:flex!important;flex:0 0 auto!important;width:max-content!important;
+  min-width:0!important;max-width:none!important;margin:0!important;
+  padding:6px 9px!important;border-radius:12px!important;
+  background:rgba(254,251,232,.20)!important;border:1px solid rgba(254,251,232,.34)!important;
+  box-shadow:none!important;color:#FEFBE8!important;
+}
+#headerTools .top#countToolbar>div{display:flex!important;align-items:center!important;gap:8px!important}
+#headerTools .top#countToolbar .muted{display:block!important;margin:0!important;color:#FEFBE8!important;font-size:9px!important;white-space:nowrap!important}
+#headerTools input[type=date]{width:132px!important;max-width:132px!important;height:34px!important;padding:5px 8px!important;background:#FEFBE8!important;color:#493b37!important;border:0!important;border-radius:9px!important;font-size:12px!important}
+#headerTools #accountBar{
+  display:flex!important;flex:0 0 auto!important;width:max-content!important;max-width:100%!important;
+  align-items:center!important;justify-content:flex-start!important;gap:10px!important;
+  margin:0!important;padding:6px 8px!important;min-height:46px!important;
+  background:rgba(254,251,232,.20)!important;border:1px solid rgba(254,251,232,.34)!important;
+  border-radius:12px!important;box-shadow:none!important;color:#FEFBE8!important;
+}
+#headerTools #accountBar>span{display:flex!important;flex-direction:row!important;align-items:center!important;gap:7px!important;white-space:nowrap!important;min-width:0!important}
+#headerTools #accountBar #accountEmail{display:none!important}
+#headerTools #roleLabel{display:inline-flex!important;align-items:center!important;margin:0!important;padding:5px 8px!important;background:#FEFBE8!important;color:#493b37!important;border-radius:8px!important;font-size:10px!important;white-space:nowrap!important}
+#headerTools #syncState{display:none!important}
+#headerTools #accountActions{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:7px!important;flex:0 0 auto!important}
+#headerTools #accountBar button{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:34px!important;margin:0!important;padding:7px 10px!important;border-radius:9px!important;background:#FEFBE8!important;color:#493b37!important;border:1px solid rgba(254,251,232,.65)!important;font-size:10px!important;font-weight:800!important;white-space:nowrap!important;line-height:1!important}
+#headerTools #accountBar #signOutBtn{background:transparent!important;color:#FEFBE8!important;border:1px solid rgba(254,251,232,.65)!important}
+header nav{max-width:820px!important;margin:0 auto!important;gap:10px!important}
+header nav button{background:rgba(254,251,232,.20)!important;color:#FEFBE8!important;border:1px solid rgba(254,251,232,.35)!important;border-radius:12px!important}
+header nav button.active{background:#FEFBE8!important;color:#FE665B!important}
+.cat,.panel,.keypad-panel,.top{background:#FEFBE8!important;border-color:#f0d9cf!important}
+.cat h2{background:#fff0e9!important;border-left:4px solid #FE665B!important;color:#a94b43!important}
+.amount{background:#fff!important;border-color:#f0d9cf!important}
+.finish-count-btn,.keys .enter,#accountBar #refreshBtn,.download-btn{background:#FE665B!important;color:#FEFBE8!important}
+.smallbtn,.keys .clear{background:#fff0e9!important;color:#b94d45!important}
+.theme-toggle{background:rgba(254,251,232,.20)!important;border-color:rgba(254,251,232,.4)!important;color:#FEFBE8!important}
+body.dark-mode{background:#211d1b!important;color:#f9eee4!important}
+body.dark-mode header{background:#c94f49!important}
+body.dark-mode .cat,body.dark-mode .panel,body.dark-mode .keypad-panel,body.dark-mode .top{background:#302925!important;border-color:#59443c!important}
+body.dark-mode .cat h2{background:#49332e!important;color:#ffe9df!important;border-left-color:#FE665B!important}
+body.dark-mode .name,body.dark-mode .amount{color:#f9eee4!important}
+@media(max-width:700px){
+ .header-main{align-items:center!important;gap:9px!important}
+ #headerTools{grid-template-columns:minmax(0,1fr)!important;justify-content:stretch!important;gap:6px!important}
+ #headerTools .top#countToolbar{width:max-content!important;max-width:100%!important}
+ #headerTools #accountBar{width:max-content!important;max-width:100%!important;justify-self:start!important;min-height:40px!important}
+}
+@media(max-width:420px){
+ header{padding-left:9px!important;padding-right:9px!important}
+ .header-main{gap:7px!important}
+ .brand-icon{width:42px!important;height:42px!important}
+ #headerTools .top#countToolbar{padding:5px 7px!important}
+ #headerTools input[type=date]{width:120px!important;max-width:120px!important}
+ #headerTools #accountBar{gap:6px!important;padding:5px 6px!important}
+ #headerTools #accountBar button{padding:7px 8px!important;font-size:9px!important}
+ #headerTools #roleLabel{font-size:9px!important;padding:4px 6px!important}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1550,26 +1626,3 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",
 renderCount();
 </script>
 </div></body></html>
-/* Ajuste fino del encabezado: fecha compacta y acciones separadas */
-.header-main{display:flex;align-items:center;gap:14px;}
-#headerTools{display:flex;align-items:center;justify-content:flex-start;gap:10px;flex:1;min-width:0;}
-#headerTools .top#countToolbar{display:flex!important;flex:0 0 auto;width:max-content!important;min-width:0;padding:7px 10px;margin:0;}
-#headerTools .top#countToolbar>div{display:flex;align-items:center;gap:9px;}
-#headerTools .top#countToolbar .muted{display:block!important;font-size:10px!important;white-space:nowrap;}
-#headerTools input[type=date]{width:132px;max-width:132px;}
-#headerTools #accountBar{flex:0 0 auto;margin-left:auto;gap:12px;padding:7px 10px;}
-#headerTools #accountBar>span{display:flex;flex-direction:row;align-items:center;gap:8px;white-space:nowrap;}
-#headerTools #accountBar>span br{display:none;}
-#headerTools #roleLabel{display:inline-flex;align-items:center;min-height:28px;}
-#headerTools #syncState{display:inline-block;max-width:110px;overflow:hidden;text-overflow:ellipsis;}
-#headerTools #accountActions{display:flex;align-items:center;gap:7px;}
-#headerTools #accountBar button{min-height:34px;padding:8px 11px;font-size:11px;}
-#headerTools #accountBar #refreshBtn{background:#fff;color:#263d50;border:1px solid rgba(255,255,255,.35);}
-#headerTools #accountBar #signOutBtn{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.32);}
-@media(max-width:700px){
- .header-main{align-items:flex-start;}
- #headerTools{flex-direction:column;align-items:stretch;gap:7px;}
- #headerTools .top#countToolbar{width:100%!important;}
- #headerTools #accountBar{width:100%;margin-left:0;justify-content:space-between;}
- #headerTools #accountBar>span{flex-direction:row;}
-}
