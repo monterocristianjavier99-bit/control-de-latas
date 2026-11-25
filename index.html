@@ -658,6 +658,471 @@ body.dark-mode #authCard p,body.dark-mode #authCard label{color:#b7c2c9!importan
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}
 }
 
+
+/* --- Ajuste de espaciado y agrupación de botones --- */
+button{
+  min-height:40px;
+  line-height:1.2;
+}
+header nav{
+  gap:12px!important;
+}
+header nav button{
+  padding:11px 9px!important;
+  min-height:44px!important;
+}
+#headerTools{
+  gap:10px!important;
+}
+#headerTools .top{
+  column-gap:12px!important;
+  padding:9px 11px!important;
+}
+#headerTools #accountBar{
+  gap:12px!important;
+  padding:7px 9px!important;
+}
+#headerTools #accountActions{
+  gap:9px!important;
+}
+#headerTools #accountBar button{
+  min-height:36px!important;
+  padding:8px 11px!important;
+}
+#countView .finish-count-btn{
+  margin-top:23px!important;
+  margin-bottom:20px!important;
+  min-height:54px!important;
+}
+.history-row{
+  align-items:center!important;
+  gap:16px!important;
+  padding:16px 2px!important;
+}
+.history-row>div:first-child{
+  flex:1 1 170px;
+  min-width:0;
+}
+.history-row>div:last-child{
+  display:flex!important;
+  flex:0 0 auto;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:10px!important;
+}
+.history-row .smallbtn{
+  min-width:42px;
+  min-height:40px!important;
+  padding:9px 13px!important;
+  margin:0!important;
+}
+#flavorsView .panel>button{
+  margin:8px 8px 0 0!important;
+}
+#flavorsView .panel>button:last-of-type{
+  margin-right:0!important;
+}
+#editList .cat{
+  padding:13px!important;
+  margin-bottom:16px!important;
+}
+#editList .editrow{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 40px 40px 40px!important;
+  align-items:center;
+  gap:10px!important;
+  margin:11px 0!important;
+}
+#editList .editrow input{
+  min-height:43px!important;
+  padding:9px 11px!important;
+}
+#editList .editrow button{
+  width:40px;
+  height:40px;
+  min-height:40px!important;
+  padding:0!important;
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:11px!important;
+  margin:0!important;
+  font-size:15px!important;
+}
+#editList .cat>button[data-add]{
+  margin:10px 0 2px!important;
+  min-height:40px!important;
+  padding:9px 14px!important;
+}
+#addCategory,#restore{
+  min-height:42px!important;
+  padding:10px 14px!important;
+  margin:9px 9px 0 0!important;
+}
+#saveFlavorsBtn{
+  margin-top:20px!important;
+  min-height:53px!important;
+}
+.report-toolbar{
+  display:flex!important;
+  flex-wrap:wrap;
+  gap:12px!important;
+}
+.report-toolbar button{
+  min-height:42px!important;
+  padding:10px 14px!important;
+}
+.keyhead{gap:14px!important}
+.keyhead .close{flex:0 0 40px;width:40px;height:40px}
+.keys{gap:12px!important}
+.keys button{min-height:62px!important}
+#authActions{gap:12px!important}
+#authActions button{min-height:48px!important;padding:12px!important}
+@media(max-width:520px){
+  header nav{gap:9px!important}
+  header nav button{padding:10px 5px!important;font-size:11px!important}
+  #headerTools{gap:8px!important}
+  #headerTools .top{column-gap:8px!important}
+  #headerTools #accountBar{gap:8px!important}
+  #headerTools #accountActions{gap:7px!important}
+  #headerTools #accountBar button{padding:8px 9px!important;font-size:9px!important}
+  .history-row{
+    align-items:flex-start!important;
+    flex-direction:column;
+    gap:10px!important;
+    padding:15px 2px!important;
+  }
+  .history-row>div:last-child{
+    width:100%;
+    justify-content:flex-start!important;
+    gap:10px!important;
+  }
+  .history-row .smallbtn{
+    min-width:76px;
+    min-height:40px!important;
+  }
+  #editList .editrow{
+    grid-template-columns:minmax(0,1fr) 38px 38px 38px!important;
+    gap:8px!important;
+    margin:12px 0!important;
+  }
+  #editList .editrow button{
+    width:38px;height:40px;min-height:40px!important;
+  }
+  #flavorsView .panel>button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin:7px 7px 0 0!important;
+  }
+  .report-toolbar{gap:9px!important}
+  .report-toolbar button{flex:1 1 145px}
+}
+@media(max-width:360px){
+  #editList .editrow{grid-template-columns:minmax(0,1fr) 34px 34px 34px!important;gap:6px!important}
+  #editList .editrow button{width:34px}
+  #headerTools #accountActions{gap:5px!important}
+  #headerTools #accountBar button{padding:7px!important}
+}
+
+
+/* ======================================================
+   ACABADO PROFESIONAL · SISTEMA DE INVENTARIO
+   Jerarquía visual, consistencia y controles táctiles.
+   ====================================================== */
+:root{
+  --pro-navy:#203747;
+  --pro-blue:#36566b;
+  --pro-coral:#c97869;
+  --pro-green:#39745a;
+  --pro-red:#b85e55;
+  --pro-border:#e1e7eb;
+  --pro-muted:#71808a;
+  --pro-shadow:0 10px 28px rgba(27,45,59,.065);
+}
+body{
+  background:#f2f5f7!important;
+  color:#253744!important;
+  letter-spacing:0;
+}
+header{
+  background:linear-gradient(135deg,#1e3342 0%,#29495e 58%,#3d6278 100%)!important;
+  box-shadow:0 10px 30px rgba(24,43,57,.16)!important;
+}
+header nav button{
+  border:1px solid rgba(255,255,255,.18)!important;
+  background:rgba(255,255,255,.10)!important;
+  color:#f7fafc!important;
+  font-weight:750!important;
+  letter-spacing:.01em;
+}
+header nav button.active{
+  background:#fff!important;
+  color:#203747!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.13)!important;
+}
+.theme-toggle{
+  background:rgba(255,255,255,.12)!important;
+  border:1px solid rgba(255,255,255,.25)!important;
+  font-weight:750!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+#accountBar{
+  border:1px solid rgba(255,255,255,.17)!important;
+  background:rgba(255,255,255,.10)!important;
+}
+#headerTools #accountBar button{
+  border:1px solid rgba(255,255,255,.2)!important;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+#headerTools #accountBar #refreshBtn{
+  background:#fff!important;
+  color:#203747!important;
+}
+#headerTools #accountBar #signOutBtn{
+  background:rgba(255,255,255,.12)!important;
+  color:#fff!important;
+}
+#headerTools .top{
+  border:1px solid rgba(255,255,255,.16)!important;
+  background:rgba(255,255,255,.09)!important;
+}
+#headerTools .download-btn{
+  background:#fff!important;
+  color:#203747!important;
+  box-shadow:0 3px 8px rgba(0,0,0,.09)!important;
+}
+main{max-width:800px!important}
+#countView>.progress{
+  height:8px!important;
+  border-radius:20px!important;
+  background:#e2e8ec!important;
+}
+#countView>.progress i{
+  background:linear-gradient(90deg,#527d91,#d18a78)!important;
+}
+.cat,.panel,.keypad-panel,.report-sheet{
+  border:1px solid var(--pro-border)!important;
+  background:#fff!important;
+  box-shadow:var(--pro-shadow)!important;
+}
+.cat{
+  border-radius:17px!important;
+  padding:13px!important;
+  margin-bottom:15px!important;
+}
+.cat h2{
+  min-height:43px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding:10px 14px!important;
+  background:#f1f5f7!important;
+  border-left:4px solid var(--pro-coral)!important;
+  border-radius:10px!important;
+  color:#304b5d!important;
+  font-size:12px!important;
+  font-weight:850!important;
+  letter-spacing:.10em!important;
+}
+.flavor{
+  min-height:59px!important;
+  grid-template-columns:minmax(0,1fr) 80px!important;
+  gap:12px!important;
+  padding:8px 5px!important;
+  border-bottom:1px solid #edf1f3!important;
+}
+.name{
+  color:#2d3e49!important;
+  font-size:14px!important;
+  font-weight:620!important;
+}
+.amount{
+  min-height:44px!important;
+  border:1px solid #dfe6ea!important;
+  border-radius:11px!important;
+  background:#f8fafb!important;
+  color:#2b4658!important;
+  font-size:18px!important;
+  font-weight:800!important;
+  box-shadow:none!important;
+}
+.amount:not(.empty){
+  background:#edf5f0!important;
+  border-color:#c9ded2!important;
+  color:#286044!important;
+}
+.finish-count-btn{
+  min-height:54px!important;
+  border-radius:13px!important;
+  background:linear-gradient(110deg,#b75d54,#ce7869)!important;
+  box-shadow:0 7px 17px rgba(183,93,84,.19)!important;
+  font-weight:850!important;
+  letter-spacing:.01em;
+}
+.hint{
+  border:1px solid #e2e9e5!important;
+  background:#eef3f0!important;
+  color:#61736a!important;
+  border-radius:11px!important;
+}
+.panel{
+  padding:19px!important;
+  border-radius:17px!important;
+}
+.panel h2{
+  color:#263e4e!important;
+  font-size:18px!important;
+  font-weight:820!important;
+  padding-bottom:12px;
+  border-bottom:1px solid #edf1f3;
+}
+.smallbtn{
+  min-height:40px!important;
+  padding:9px 13px!important;
+  border:1px solid #dfe6e9!important;
+  border-radius:10px!important;
+  background:#f3f6f7!important;
+  color:#304b5d!important;
+  font-size:12px!important;
+  font-weight:750!important;
+  box-shadow:0 2px 4px rgba(30,50,65,.035);
+}
+.smallbtn:hover{background:#eaf0f3!important}
+.history-row{
+  padding:16px 3px!important;
+  border-bottom:1px solid #edf1f3!important;
+}
+.history-row .muted{margin-top:4px;line-height:1.4}
+#editList .cat{
+  border-radius:15px!important;
+  padding:14px!important;
+}
+#editList .editrow input{
+  border:1px solid #dce4e8!important;
+  border-radius:10px!important;
+  background:#fbfcfd!important;
+  color:#2d4352!important;
+}
+#editList .editrow button{
+  border:1px solid #dfe6e9!important;
+  background:#f1f5f7!important;
+  color:#36566b!important;
+  font-weight:850!important;
+}
+#editList .editrow button[data-delcat],
+#editList .editrow button[data-delf]{
+  color:#b4564e!important;
+  background:#fbf0ee!important;
+  border-color:#f0d9d5!important;
+}
+#editList button[data-add]{
+  background:#edf4f1!important;
+  color:#39745a!important;
+  border:1px solid #d7e7dd!important;
+  border-radius:10px!important;
+  font-weight:800!important;
+}
+#addCategory,#restore{
+  border-radius:11px!important;
+  min-height:42px!important;
+}
+#addCategory{background:#edf4f1!important;color:#39745a!important;border-color:#d7e7dd!important}
+#restore{background:#f4f6f7!important;color:#52636d!important}
+#saveFlavorsBtn{
+  background:linear-gradient(110deg,#294c60,#47758a)!important;
+  border-radius:13px!important;
+  box-shadow:0 7px 16px rgba(41,76,96,.17)!important;
+  letter-spacing:.01em;
+}
+.report-toolbar button{border-radius:11px!important}
+.report-sheet{padding:22px!important}
+.keys button{
+  border:1px solid #e1e8ec!important;
+  background:#f3f6f8!important;
+  color:#29485c!important;
+  box-shadow:0 2px 5px rgba(30,50,65,.04)!important;
+}
+.keys .clear{
+  background:#fbefed!important;
+  color:#b4564e!important;
+  border-color:#f0d9d5!important;
+}
+.keys .enter{
+  background:#29485c!important;
+  color:#fff!important;
+  border-color:#29485c!important;
+}
+#authCard{
+  border:1px solid #e1e7eb!important;
+  box-shadow:0 18px 45px rgba(27,45,59,.13)!important;
+}
+#authCard h2{color:#243d4e!important}
+#authActions button{background:#29485c!important}
+#authActions button.secondary{background:#edf1f3!important;color:#29485c!important}
+body.dark-mode{
+  background:#101922!important;
+  color:#edf2f5!important;
+}
+body.dark-mode .cat,
+body.dark-mode .panel,
+body.dark-mode .keypad-panel,
+body.dark-mode .report-sheet{
+  background:#1b2934!important;
+  border-color:#344651!important;
+}
+body.dark-mode .cat h2{
+  background:#263945!important;
+  color:#eaf0f3!important;
+  border-left-color:#d18a78!important;
+}
+body.dark-mode .panel h2,
+body.dark-mode .name,
+body.dark-mode .history-row{color:#edf2f5!important}
+body.dark-mode .panel h2{border-bottom-color:#344651!important}
+body.dark-mode .flavor{border-bottom-color:#344651!important}
+body.dark-mode .amount,
+body.dark-mode #editList .editrow input{
+  background:#243541!important;
+  border-color:#405460!important;
+  color:#f1f5f7!important;
+}
+body.dark-mode .smallbtn,
+body.dark-mode #editList .editrow button{
+  background:#2a3d49!important;
+  border-color:#405460!important;
+  color:#eaf0f3!important;
+}
+body.dark-mode #editList .editrow button[data-delcat],
+body.dark-mode #editList .editrow button[data-delf]{
+  background:#4a302f!important;
+  border-color:#68413e!important;
+  color:#ffd9d4!important;
+}
+body.dark-mode #editList button[data-add],
+body.dark-mode #addCategory{
+  background:#294338!important;
+  border-color:#3c5b4b!important;
+  color:#c9e5d4!important;
+}
+body.dark-mode #restore{background:#2a3a45!important;color:#e2e9ed!important}
+body.dark-mode .hint{background:#22352f!important;border-color:#354d43!important;color:#c5d7cd!important}
+body.dark-mode .keys button{background:#2a3c48!important;border-color:#405460!important;color:#f0f4f6!important}
+body.dark-mode .keys .clear{background:#4a302f!important;color:#ffd9d4!important}
+body.dark-mode .keys .enter{background:#d18a78!important;color:#17232c!important}
+@media(max-width:520px){
+  main{max-width:100%!important}
+  .cat{padding:10px!important;margin-bottom:13px!important}
+  .flavor{grid-template-columns:minmax(0,1fr) 74px!important;gap:9px!important}
+  .name{font-size:13px!important}
+  .panel{padding:15px!important}
+  #editList .editrow{gap:7px!important}
+  #editList .editrow input{font-size:12px!important}
+  .history-row>div:last-child{gap:9px!important}
+  .history-row .smallbtn{min-width:82px!important}
+  .save-flavors-note{line-height:1.5!important}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
