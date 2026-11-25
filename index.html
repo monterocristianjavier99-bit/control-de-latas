@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#34495e">
+<meta name="theme-color" content="#FE665B">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>CONTROL DE LATAS</title>
 <!-- Interfaz renovada: diseño integral adaptable a iPhone y escritorio -->
 <style>
@@ -1230,6 +1230,9 @@ body.dark-mode .name,body.dark-mode .amount{color:#f9eee4!important}
  #headerTools #roleLabel{font-size:9px!important;padding:4px 6px!important}
 }
 
+/* Logo completo en el encabezado, con los colores de la app. */
+.brand-icon{width:96px!important;height:64px!important;object-fit:contain!important;background:#FEFBE8!important;padding:3px!important;border-radius:10px!important;box-shadow:0 4px 12px rgba(0,0,0,.16)!important}
+@media(max-width:700px){.brand-icon{width:72px!important;height:48px!important}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1246,7 +1249,7 @@ body.dark-mode .name,body.dark-mode .amount{color:#f9eee4!important}
  </div>
 </section>
 <div id="appShell" class="hidden">
-<header><div class="header-main"><div class="brand-stack"><img class="brand-icon" src="icon-192.png" alt="Logo de CONTROL DE LATAS"><button id="themeToggle" class="theme-toggle" type="button" aria-label="Activar modo noche">☾ Modo noche</button></div><div class="header-tools" id="headerTools"></div></div><nav>
+<header><div class="header-main"><div class="brand-stack"><img class="brand-icon" src="logo-la-frantina.png" alt="Logo de La Frantina"><button id="themeToggle" class="theme-toggle" type="button" aria-label="Activar modo noche">☾ Modo noche</button></div><div class="header-tools" id="headerTools"></div></div><nav>
 <button class="active" data-view="count">Conteo</button><button data-view="history">Historial</button><button data-view="flavors">Sabores</button>
 </nav></header>
 <main>
